@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.png binary
+*.gif binary
+*.mp4 binary
+*.webm binary
+*.jpg binary
+*.zip binary
+skills/seecode/scripts/vendor/*.js linguist-vendored=true

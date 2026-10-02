@@ -1,0 +1,22 @@
+{
+  "name": "seecode",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "description": "Animated, explorable diagrams for Claude and other coding agents, from a short JSON spec.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": "https://github.com/Aryanutkarsh/seecode",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "gallery": "node tools/build-gallery.mjs",
+    "budget": "node tools/budget.mjs",
+    "zip": "node tools/build-zip.mjs",
+    "bump": "node tools/bump-version.mjs",
+    "shots": "node tools/readme-shots.mjs",
+    "feature-gifs": "node tools/feature-gifs.mjs",
+    "mark": "node tools/build-mark.mjs"
+  }
+}

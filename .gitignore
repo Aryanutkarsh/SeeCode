@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+
+# reference clones (never published)
+.repos/
+
+# archived branding exploration
+/logo-iterations/
+
+# local Claude Code / editor state
+.claude/
+.vscode/
+.idea/
+
+# SeeCode runtime state and output
+.seecode/
+diagrams/
+out/
+
+# generated: gallery pages and HTML rendered next to example specs
+examples/gallery/
+examples/specs/**/*.html
+examples/specs/**/*.png
+examples/specs/**/*.gif
+examples/specs/**/*.mp4
+
+# OS / logs
+.DS_Store
+*.log
+*.tmp-*
+
+# release build output
+dist/
+
+# outdated viewer recording (pre-watermark, old dark theme); re-record before publishing
+examples/media/viewer-demo.webm
