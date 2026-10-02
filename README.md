@@ -19,8 +19,9 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Aryanutkarsh/seecode/stargazers"><img src="https://img.shields.io/github/stars/Aryanutkarsh/seecode?style=flat-square&logo=github&label=Star&color=D4A574" alt="Star SeeCode on GitHub" /></a>
   <a href="https://github.com/Aryanutkarsh/seecode/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Aryanutkarsh/seecode/ci.yml?branch=main&style=flat-square&label=CI" alt="CI" /></a>
-  <a href="https://github.com/Aryanutkarsh/seecode/releases/latest"><img src="https://img.shields.io/github/v/release/Aryanutkarsh/seecode?style=flat-square&color=2f54eb&label=version" alt="Latest release" /></a>
+  <a href="https://github.com/Aryanutkarsh/seecode/blob/main/package.json"><img src="https://img.shields.io/github/package-json/v/Aryanutkarsh/seecode?style=flat-square&color=2f54eb&label=version" alt="Version" /></a>
   <a href="skills/seecode/SKILL.md"><img src="https://img.shields.io/badge/Agent-Skill-7C3AED?style=flat-square" alt="Agent Skill" /></a>
   <img src="https://img.shields.io/badge/dependencies-0-22c55e?style=flat-square" alt="Zero dependencies" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square" alt="MIT License" /></a>
