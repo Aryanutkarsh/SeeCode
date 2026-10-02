@@ -1,0 +1,54 @@
+name: Release
+# On every merge to main that changes the skill: bump the patch version in all
+# manifests (so Claude Code / Codex / Copilot / Factory installs auto-update),
+# tag it, and attach a reproducible seecode.zip for Claude.ai uploads.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - 'commands/**'
+      - '.claude-plugin/**'
+      - '.codex-plugin/**'
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: patch | minor | major
+        default: patch
+
+permissions:
+  contents: write
+
+concurrency: release
+
+jobs:
+  release:
+    if: "!startsWith(github.event.head_commit.message, 'chore(release)')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - name: Bump version
+        id: bump
+        run: |
+          node tools/bump-version.mjs "${{ github.event.inputs.bump || 'patch' }}"
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Commit and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore(release): v${{ steps.bump.outputs.version }}"
+          git tag "v${{ steps.bump.outputs.version }}"
+          git push origin HEAD --tags
+      - run: node tools/build-zip.mjs
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.bump.outputs.version }}" dist/seecode.zip \
+            --title "SeeCode v${{ steps.bump.outputs.version }}" --generate-notes

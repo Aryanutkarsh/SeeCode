@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "repository": "Aryanutkarsh/seecode",
+  "base_branch": "main",
+  "default_merge_method": "squash",
+  "versioning": {
+    "enabled": true,
+    "strategy": "semver",
+    "increment": "patch",
+    "source_of_truth": "package.json",
+    "manifests": [
+      { "path": "package.json", "json_pointer": "/version" },
+      { "path": ".claude-plugin/plugin.json", "json_pointer": "/version" },
+      { "path": ".claude-plugin/marketplace.json", "json_pointer": "/plugins/0/version" },
+      { "path": ".codex-plugin/plugin.json", "json_pointer": "/version" },
+      { "path": ".factory-plugin/plugin.json", "json_pointer": "/version" }
+    ],
+    "also_updates": ["skills/seecode/SKILL.md (frontmatter version)"],
+    "require_synchronized": true,
+    "bump_command": "npm run bump -- patch|minor|major",
+    "bumped_by": "Release workflow on push to main when skills/ changes",
+    "pr_manifest_version_changes": "forbidden",
+    "pr_version_check": "node tools/check-version-unchanged.mjs origin/main",
+    "bump_size": "patch by default; minor or major via the Release workflow's manual run input"
+  },
+  "gates": {
+    "local_commands": [
+      "npm test",
+      "node tools/check-version-unchanged.mjs origin/main",
+      "claude plugin validate . --strict",
+      "node skills/seecode/scripts/seecode.mjs doctor",
+      "npm run budget"
+    ],
+    "ci_matrix": { "os": ["ubuntu-latest", "macos-latest"], "node": [20, 22] },
+    "size_caps_bytes": {
+      "skills/seecode/SKILL.md": 4096,
+      "skills/seecode/references/types/<type>.md": 1536,
+      "skills/seecode/references/types/INDEX.md": 2560
+    },
+    "zero_runtime_dependencies": true,
+    "screenshots_command": "npm run shots",
+    "require_current_base": true,
+    "require_conflict_free": true,
+    "require_resolved_threads": true,
+    "require_no_requested_changes": true,
+    "post_merge_workflows": ["CI", "Release"]
+  },
+  "issue_policy": {
+    "read_complete_threads": true,
+    "search_competing_prs": true,
+    "reproduce_on_current_main": true,
+    "inspect_history_for_intent": true
+  },
+  "pr_policy": {
+    "one_concern_per_pr": true,
+    "split_large_or_mixed_scope": true,
+    "run_complete_suite_on_exact_head": true,
+    "visual_changes_include_screenshots": true,
+    "wait_for_post_merge_before_next": true
+  },
+  "human_gates": [
+    "product_priority",
+    "new_diagram_type",
+    "large_or_mixed_scope",
+    "first_time_workflow_approval",
+    "security_disclosure",
+    "release_size_minor_or_major",
+    "merge_authorization"
+  ]
+}

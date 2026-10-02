@@ -1,0 +1,46 @@
+{
+  "name": "seecode",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Animated, explorable editorial diagrams in 42 types \u2014 architecture, flowchart, sequence, state, ER, DB schema, UML, swimlane, timeline, Gantt, journey, tree, Venn, quadrant, fishbone, Wardley, bar, line, scatter, Sankey, treemap, heatmap and more \u2014 from a short JSON spec. Hover traces, click-to-focus, route journeys; exports SVG, PNG, GIF, MP4; imports Mermaid, Graphviz, PlantUML, D2, draw.io, Excalidraw, SQL and CSV.",
+  "author": {
+    "name": "Aryanutkarsh",
+    "url": "https://github.com/Aryanutkarsh"
+  },
+  "homepage": "https://github.com/Aryanutkarsh/seecode",
+  "repository": "https://github.com/Aryanutkarsh/seecode",
+  "keywords": [
+    "diagrams",
+    "architecture",
+    "flowchart",
+    "sequence",
+    "animation",
+    "svg",
+    "gif",
+    "mp4",
+    "mermaid",
+    "visualization",
+    "explainer"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "SeeCode",
+    "shortDescription": "Animated, explorable diagrams",
+    "longDescription": "SeeCode turns a description of your system, process, codebase or data into an editorial diagram you can explore: hover to watch data flow, click to zoom into a node, walk a route step by step. You describe it; the agent writes a short spec and SeeCode handles layout, routing, styling, motion and export \u2014 interactive HTML for explaining, SVG for docs and PDFs, GIF and MP4 for sharing. It also redraws Mermaid, Graphviz, PlantUML, D2, draw.io, Excalidraw, SQL and CSV.",
+    "developerName": "Aryanutkarsh",
+    "category": "Creativity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/Aryanutkarsh/seecode",
+    "defaultPrompt": [
+      "Use SeeCode to show how our checkout flow works.",
+      "Diagram this repository's architecture with SeeCode.",
+      "Turn this Mermaid file into a SeeCode diagram and export it for my slides."
+    ],
+    "brandColor": "#2f54eb",
+    "logo": "./branding/logo.png",
+    "composerIcon": "./branding/favicon.png"
+  }
+}

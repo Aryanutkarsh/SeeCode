@@ -1,0 +1,18 @@
+{
+  "name": "seecode",
+  "owner": {
+    "name": "Aryanutkarsh",
+    "url": "https://github.com/Aryanutkarsh"
+  },
+  "metadata": {
+    "description": "Animated, explorable editorial diagrams in 42 types — architecture, flowchart, sequence, state, ER, DB schema, UML, swimlane, timeline, Gantt, journey, tree, Venn, quadrant, fishbone, Wardley, bar, line, scatter, Sankey, treemap, heatmap and more — from a short JSON spec. Hover traces, click-to-focus, route journeys; exports SVG, PNG, GIF, MP4; imports Mermaid, Graphviz, PlantUML, D2, draw.io, Excalidraw, SQL and CSV."
+  },
+  "plugins": [
+    {
+      "name": "seecode",
+      "source": "./",
+      "description": "Animated, explorable editorial diagrams in 42 types — architecture, flowchart, sequence, state, ER, DB schema, UML, swimlane, timeline, Gantt, journey, tree, Venn, quadrant, fishbone, Wardley, bar, line, scatter, Sankey, treemap, heatmap and more — from a short JSON spec. Hover traces, click-to-focus, route journeys; exports SVG, PNG, GIF, MP4; imports Mermaid, Graphviz, PlantUML, D2, draw.io, Excalidraw, SQL and CSV.",
+      "version": "0.1.0"
+    }
+  ]
+}
