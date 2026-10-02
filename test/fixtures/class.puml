@@ -1,0 +1,10 @@
+@startuml
+interface Shape {
+  +area() double
+}
+class Circle {
+  -r double
+  +area() double
+}
+Shape <|.. Circle
+@enduml

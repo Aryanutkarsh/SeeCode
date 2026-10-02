@@ -1,0 +1,10 @@
+digraph G {
+  rankdir=LR;
+  node [shape=box];
+  // modules
+  cli -> core -> util;
+  web -> core [label="imports"];
+  db [shape=cylinder, label="Postgres"];
+  core -> db [style=dashed];
+  subgraph cluster_app { label="App"; cli; web; }
+}

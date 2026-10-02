@@ -1,0 +1,13 @@
+@startuml
+actor User
+participant "Auth API" as Auth
+database Users
+User -> Auth : login
+Auth -> Users : find user
+Users --> Auth : row
+alt valid
+  Auth --> User : token
+else invalid
+  Auth --> User : 401
+end
+@enduml

@@ -1,0 +1,10 @@
+@startuml
+start
+:Receive order;
+if (In stock?) then (yes)
+  :Ship;
+else (no)
+  :Backorder;
+endif
+stop
+@enduml

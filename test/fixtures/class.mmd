@@ -1,0 +1,9 @@
+classDiagram
+  class Provider {
+    <<interface>>
+    +charge(amount) Receipt
+  }
+  Provider <|.. Stripe
+  Provider <|.. Adyen
+  CheckoutService --> Provider : uses
+  Stripe : -apiKey string

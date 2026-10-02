@@ -1,0 +1,13 @@
+%% checkout flow
+flowchart LR
+  user([Shopper]) --> web[Storefront]
+  web -->|POST /order| api{{Checkout API}}
+  api --> db[(Orders DB)]
+  api -. order.placed .-> q[(Kafka)]
+  q --> mail[Receipts] & bi[Analytics]
+  subgraph core [Core services]
+    api
+    db
+  end
+  click api "https://example.com"
+  classDef hot fill:#f00

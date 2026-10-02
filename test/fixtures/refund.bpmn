@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL">
+ <bpmn:process id="p">
+  <bpmn:laneSet><bpmn:lane id="L1" name="Customer"><bpmn:flowNodeRef>s</bpmn:flowNodeRef><bpmn:flowNodeRef>ask</bpmn:flowNodeRef></bpmn:lane>
+  <bpmn:lane id="L2" name="Support"><bpmn:flowNodeRef>g</bpmn:flowNodeRef><bpmn:flowNodeRef>pay</bpmn:flowNodeRef><bpmn:flowNodeRef>e</bpmn:flowNodeRef></bpmn:lane></bpmn:laneSet>
+  <bpmn:startEvent id="s"/><bpmn:task id="ask" name="Request refund"/><bpmn:exclusiveGateway id="g" name="Eligible?"/>
+  <bpmn:task id="pay" name="Pay out"/><bpmn:endEvent id="e"/>
+  <bpmn:sequenceFlow id="f1" sourceRef="s" targetRef="ask"/><bpmn:sequenceFlow id="f2" sourceRef="ask" targetRef="g"/>
+  <bpmn:sequenceFlow id="f3" sourceRef="g" targetRef="pay" name="yes"/><bpmn:sequenceFlow id="f4" sourceRef="pay" targetRef="e"/>
+ </bpmn:process>
+</bpmn:definitions>

@@ -1,0 +1,17 @@
+openapi: 3.0.0
+info:
+  title: Pet Store
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      tags: [pets]
+    post:
+      tags: [pets]
+  /pets/{id}:
+    get:
+      tags: [pets]
+  /orders:
+    post:
+      tags:
+        - store

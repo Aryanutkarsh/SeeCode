@@ -1,0 +1,10 @@
+<mxfile><diagram name="Board" id="1"><mxGraphModel><root>
+<mxCell id="0"/><mxCell id="1" parent="0"/>
+<mxCell id="a" value="Web" style="rounded=1;" vertex="1" parent="1"><mxGeometry x="40" y="100" width="120" height="60" as="geometry"/></mxCell>
+<mxCell id="b" value="API &lt;br&gt;service" style="rounded=1;" vertex="1" parent="1"><mxGeometry x="240" y="100" width="120" height="60" as="geometry"/></mxCell>
+<mxCell id="c" value="DB" style="shape=cylinder3;" vertex="1" parent="1"><mxGeometry x="440" y="100" width="80" height="80" as="geometry"/></mxCell>
+<mxCell id="d" value="Cache" style="shape=cylinder3;dashed=1;" vertex="1" parent="1"><mxGeometry x="240" y="260" width="120" height="60" as="geometry"/></mxCell>
+<mxCell id="e1" value="calls" style="endArrow=classic;" edge="1" parent="1" source="a" target="b"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e2" style="dashed=1;" edge="1" parent="1" source="b" target="c"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e3" edge="1" parent="1" source="b" target="d"><mxGeometry relative="1" as="geometry"/></mxCell>
+</root></mxGraphModel></diagram></mxfile>

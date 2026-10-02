@@ -1,0 +1,15 @@
+sequenceDiagram
+  autonumber
+  actor U as Browser
+  participant A as API
+  participant C as Cache
+  U->>A: GET /items/42
+  A->>C: get item:42
+  C-->>A: miss
+  alt cache miss
+    A->>A: load from DB
+  else hit
+    A-->>U: cached
+  end
+  Note over A,C: TTL 60s
+  A-->>U: 200 OK

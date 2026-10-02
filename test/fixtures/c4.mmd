@@ -1,0 +1,10 @@
+C4Container
+  Person(user, "Customer", "Buys things")
+  System_Boundary(shop, "Shop") {
+    Container(web, "Web app", "React")
+    Container(api, "API", "Go")
+    ContainerDb(db, "Database", "Postgres")
+  }
+  Rel(user, web, "Uses")
+  Rel(web, api, "Calls", "JSON/HTTPS")
+  Rel(api, db, "Reads/writes")

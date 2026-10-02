@@ -1,0 +1,10 @@
+direction: right
+users: Users { shape: person }
+cloud: AWS {
+  lb: Load balancer
+  api: API
+  db: Postgres
+  db.shape: cylinder
+}
+users -> cloud.lb: HTTPS
+cloud.lb -> cloud.api -> cloud.db: query

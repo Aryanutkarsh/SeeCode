@@ -1,0 +1,9 @@
+@startuml
+package "Backend" {
+  [API] as api
+  database "Orders" as orders
+}
+actor User
+User --> api : HTTPS
+api --> orders : SQL
+@enduml
