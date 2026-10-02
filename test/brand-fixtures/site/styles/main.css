@@ -1,0 +1,15 @@
+:root {
+  --color-background: #faf7f2;
+  --color-text: #22201d;
+  --color-primary: #e4572e;
+  --color-link: #1b6fa8;
+}
+body { background: var(--color-background); color: var(--color-text); font-family: "Inter", sans-serif; }
+a { color: var(--color-link); }
+.btn-primary { background: var(--color-primary); color: #fff; }
+.card { border: 1px solid #e6e1d8; }
+h1, h2 { font-family: "Playfair Display", Georgia, serif; }
+code, pre { font-family: var(--font-mono); }
+:root { --font-mono: "JetBrains Mono", ui-monospace, monospace; }
+@font-face { font-family: "Acme Sans"; src: url("../fonts/acme-sans.woff2") format("woff2"); font-weight: 400; }
+.legal { font-family: "Acme Sans", sans-serif; }
