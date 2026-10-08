@@ -51,7 +51,7 @@
     "edges": [
         [
             "stage0_0",
-            "api"
+            "cdc"
         ],
         [
             "stage0_1",
@@ -59,7 +59,7 @@
         ],
         [
             "stage0_2",
-            "cdc"
+            "api"
         ],
         [
             "cdc",

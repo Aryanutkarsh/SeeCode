@@ -14,7 +14,7 @@
 
 **Problems**: `{code,at,msg,fix}`.
 - `E_` blocks rendering.
-- `W_` renders, but should be fixed.
+- `W_` renders, but should be fixed. `W_ROUTE_*` (stacked, crowded, border-riding or diagonal connectors) is fixed by moving a node one row/col, as its `fix` says.
 - `I_` is optional.
 
 **Patch** (`--patch '<json>'`; the patch is merged into the spec file and saved):

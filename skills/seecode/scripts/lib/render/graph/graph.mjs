@@ -8,6 +8,7 @@ import { sizeNode, drawNode, normalizeKind, fieldY } from '../shared/nodes.mjs';
 import { drawEdge, placeLabel, labelBox } from '../shared/edges.mjs';
 import { legend } from '../shared/legend.mjs';
 import { routeEdges } from './route.mjs';
+import { checkRoutes } from './verify.mjs';
 import { compressSteps } from '../../motion.mjs';
 
 export const family = 'graph';
@@ -233,6 +234,7 @@ export function render(input) {
     }
   }
   problems.push(...routeEdges(nodes, edges, { dir, channels }));
+  problems.push(...checkRoutes(nodes, edges));
   // self loops (state machines): a small loop off the top-right corner
   for (const e of selfEdges) {
     const n = byId.get(e.from);
