@@ -180,7 +180,10 @@ async function launchChrome(path) {
       await cdp.send('Browser.close').catch(() => {});
       await Promise.race([exited, new Promise((r) => setTimeout(r, 2000))]);
       if (proc.exitCode === null) proc.kill('SIGKILL');
-      rmSync(profile, { recursive: true, force: true });
+      // Chrome's helpers can still be flushing the profile after the main
+      // process exits (ENOTEMPTY on macOS): retry, and never fail the export
+      // over a leftover temp folder
+      try { rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); } catch { /* temp dir; the OS cleans it */ }
     },
   };
 }

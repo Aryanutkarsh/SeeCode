@@ -89,7 +89,8 @@ test('a real `npx skills add` installs a skill that renders', { skip: process.en
   const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   const listed = spawnSync(npx, ['-y', SKILLS_CLI, 'add', ROOT, '-l'], { cwd: proj, env, encoding: 'utf8' });
   assert.equal(listed.status, 0, listed.stderr);
-  assert.match(listed.stdout, /Found 1 skill/, 'only seecode is exposed to installers');
+  // the installer colours its output even without a TTY (as on CI)
+  assert.match(listed.stdout.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, ''), /Found 1 skill\b/, 'only seecode is exposed to installers');
   const add = spawnSync(npx, ['-y', SKILLS_CLI, 'add', ROOT, '-a', 'claude-code', '-s', 'seecode', '-y', '--copy'], { cwd: proj, env, encoding: 'utf8' });
   assert.equal(add.status, 0, add.stderr || add.stdout);
   const installed = join(proj, '.claude/skills/seecode');
