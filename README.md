@@ -160,8 +160,20 @@ Light and dark come built in, and every diagram has a dark-mode switch that star
 </tr>
 </table>
 
+Tell your agent where your brand lives, in any of three ways:
+
 ```text
-Use SeeCode with our brand: https://yourcompany.com
+Use SeeCode with our brand: https://your-site.com
+```
+
+<sub>Replace `https://your-site.com` with your own website.</sub>
+
+```text
+Use SeeCode with the brand colours in this repo's CSS.
+```
+
+```text
+Use SeeCode with these colours: #D4A574, #E7E5E2, #1E1C1A.
 ```
 
 SeeCode reads the page and its stylesheets (or your repo's CSS, Tailwind and theme files) and works out which colour is the background, the text, the accent and the links, and which typefaces your body text, headings and code use. It builds a light and a dark version and fixes contrast where a brand colour would be hard to read: tan on off-white is deepened for light mode, while dark mode keeps it exactly. It then shows you the palette before saving it as a profile. No brand? Diagrams use the built-in themes. [How brand onboarding works](skills/seecode/references/onboarding.md)

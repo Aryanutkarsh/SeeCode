@@ -26,8 +26,11 @@ The `light` and `dark` suffixes describe the **theme where the asset should be u
 | `favicon.png` | 64 × 64 | Tan symbol on transparency |
 | `source-banner.png` | 2172 × 724 | Untouched approved original |
 | `preview.png` | 1500 × 1300 | Comparison sheet; not a production logo |
+| `social-preview.png` | 1280 × 640 | Repository social preview using the supplied template's centered layout and safe area |
 
 ## Usage
+
+Upload `social-preview.png` in the repository's social preview settings. It uses the approved logo and palette, a centered headline and two description lines, with all content inside the supplied template's 78 px guide boundaries. The guide lines and placeholder GitHub branding are omitted from the final image.
 
 Use `logo.png` when only the symbol is needed. For diagram corners, use the watermark matching the diagram theme, or a transparent banner when more resolution is needed. Leave at least 12 px between the artwork and the diagram edge at the watermark's native size. Keep the original aspect ratio when resizing.
 
