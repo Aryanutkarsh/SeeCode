@@ -9,12 +9,18 @@ export const family = 'chart';
 export function renderWaterfall(spec) {
   const problems = [];
   const steps = spec.steps.map((s) => (Array.isArray(s) ? { label: s[0], value: s[1] } : { ...s }));
+  // sum in fixed decimals so 0.1 + 0.2 lands on 0.3 and totals conserve exactly
+  const places = Math.min(10, Math.max(0, ...steps.map((s) => ((String(s.value ?? '').split(/e/i)[0].split('.')[1]) || '').length)));
+  const add = (a, b) => Number((a + b).toFixed(places));
   let run = 0;
   const bars = steps.map((s, i) => {
     if (i === 0 && s.total === undefined && s.value >= 0) { run = s.value; return { ...s, from: 0, to: s.value, kind: 'total' }; }
-    if (s.total) { const b = { ...s, from: 0, to: run, kind: 'total' }; return b; }
-    const b = { ...s, from: run, to: run + s.value, kind: s.value >= 0 ? 'up' : 'down' };
-    run += s.value;
+    if (s.total) {
+      if (typeof s.value === 'number' && s.value !== run) problems.push({ code: 'W_TOTAL', at: `steps[${i}]`, msg: `"${s.label}" says ${s.value} but the steps above sum to ${run}`, fix: 'fix the step values, or drop the total\'s value so it is computed' });
+      return { ...s, from: 0, to: run, kind: 'total' };
+    }
+    const b = { ...s, from: run, to: add(run, s.value), kind: s.value >= 0 ? 'up' : 'down' };
+    run = b.to;
     return b;
   });
   if (spec.end !== false && !steps[steps.length - 1].total) bars.push({ label: spec.endLabel || 'Total', from: 0, to: run, kind: 'total' });

@@ -8,10 +8,26 @@ export function niceStep(range, target = 5) {
   return step * mag;
 }
 
+// Always includes zero and always has a span: all-zero (or empty) data
+// would otherwise give lo === hi and every mapped value would be NaN.
 export function niceDomain(min, max, target = 5) {
-  const lo = Math.min(0, min), hi = Math.max(0, max);
+  const lo = Math.min(0, Number.isFinite(min) ? min : 0), hi = Math.max(0, Number.isFinite(max) ? max : 0);
   const step = niceStep(hi - lo || 1, target);
-  return { lo: Math.floor(lo / step) * step, hi: Math.ceil(hi / step) * step, step };
+  const dom = { lo: snap(Math.floor(lo / step) * step, step), hi: snap(Math.ceil(hi / step) * step, step), step };
+  if (dom.hi <= dom.lo) dom.hi = snap(dom.lo + step, step);
+  return dom;
+}
+
+// Lower bound for a non-zero baseline (zero:false): a whole step at or below
+// `min`, and never so high that the domain collapses.
+export function floorTo(dom, min) {
+  return snap(Math.min(Math.floor(min / dom.step) * dom.step, dom.hi - dom.step), dom.step);
+}
+
+// drop float noise (0.30000000000000004) from a multiple of step
+function snap(v, step) {
+  const d = Math.max(0, -Math.floor(Math.log10(step)) + 1);
+  return Number(v.toFixed(Math.min(12, d)));
 }
 
 export function ticks({ lo, hi, step }) {

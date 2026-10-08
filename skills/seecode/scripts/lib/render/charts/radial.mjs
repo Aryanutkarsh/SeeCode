@@ -17,7 +17,7 @@ export function renderRadar(spec) {
   series.forEach((s) => s.values.length !== axes.length && problems.push({ code: 'E_SERIES_LEN', at: `series[${s.i}]`, msg: `${s.values.length} values for ${axes.length} axes`, fix: 'one value per axis' }));
   if (problems.length) return { problems };
   if (series.length > 4) problems.push({ code: 'W_BUDGET', at: 'series', msg: `${series.length} series`, fix: 'radar reads best with ≤ 3 series' });
-  const max = spec.max || niceDomain(0, Math.max(...series.flatMap((s) => s.values))).hi;
+  const max = spec.max > 0 ? spec.max : niceDomain(0, Math.max(...series.flatMap((s) => s.values))).hi;
   const n = axes.length;
   const ang = (i) => (i * 2 * Math.PI) / n;
   const out = [];
@@ -54,7 +54,7 @@ export function renderPolar(spec) {
   const problems = [];
   const data = spec.data.map((d) => (Array.isArray(d) ? { label: d[0], value: d[1] } : d));
   if (data.length > 24) problems.push({ code: 'W_BUDGET', at: 'data', msg: `${data.length} items`, fix: 'keep ≤ 24 spokes' });
-  const max = spec.max || niceDomain(0, Math.max(...data.map((d) => d.value))).hi;
+  const max = spec.max > 0 ? spec.max : niceDomain(0, Math.max(...data.map((d) => d.value))).hi;
   const inner = 46;
   const n = data.length;
   const out = [];

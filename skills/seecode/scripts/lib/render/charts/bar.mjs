@@ -2,7 +2,7 @@
 // Accent goes to the focal bar/series only; everything else is muted.
 import { el, text } from '../../svg.mjs';
 import { textWidth } from '../../text.mjs';
-import { niceDomain, ticks, fmt } from './scale.mjs';
+import { niceDomain, floorTo, ticks, fmt } from './scale.mjs';
 import { legend } from '../shared/legend.mjs';
 
 export const family = 'chart';
@@ -13,7 +13,7 @@ function renderDumbbell(spec) {
   const rows = spec.data.map((d) => (Array.isArray(d) ? { label: d[0], a: d[1], b: d[2] } : d));
   const vals = rows.flatMap((r) => [r.a, r.b]);
   const dom = niceDomain(Math.min(...vals), Math.max(...vals));
-  if (spec.zero === false) dom.lo = Math.floor(Math.min(...vals) / dom.step) * dom.step;
+  if (spec.zero === false) dom.lo = floorTo(dom, Math.min(...vals));
   const catW = Math.max(...rows.map((r) => textWidth(r.label, { size: 10 }))) + 16;
   const PW = 480, RH = 30;
   const x = (v) => catW + ((v - dom.lo) / (dom.hi - dom.lo)) * PW;
