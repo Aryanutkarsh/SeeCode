@@ -69,6 +69,19 @@ function actor(page) {
       await sleep(70);
       await mouse('mouseReleased', pos.x, pos.y, { clickCount: 1 });
     },
+    // press on a target, travel by (dx, dy), release (e.g. the canvas grip)
+    async drag(target, dx, dy, ms = 900) {
+      await this.move(target);
+      await mouse('mousePressed', pos.x, pos.y, { clickCount: 1 });
+      const from = pos, n = Math.max(8, Math.round(ms / 25));
+      for (let i = 1; i <= n; i++) {
+        const t = i / n, e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+        await mouse('mouseMoved', from.x + dx * e, from.y + dy * e, { buttons: 1 });
+        await sleep(ms / n);
+      }
+      pos = { x: from.x + dx, y: from.y + dy };
+      await mouse('mouseReleased', pos.x, pos.y, { clickCount: 1 });
+    },
     async key(key) {
       const code = { ArrowRight: 39, ArrowLeft: 37, Escape: 27 }[key];
       await page.send('Input.dispatchKeyEvent', { type: 'keyDown', key, code: key, windowsVirtualKeyCode: code });
@@ -112,6 +125,14 @@ const SCENES = {
     await a.hold(600);
     for (let i = 0; i < 7; i++) { await a.key('ArrowRight'); await a.hold(750); }
     await a.hold(900);
+  } },
+  canvas: { spec: 'systems/architecture', async play(a) {
+    await a.hold(500);
+    await a.drag('.sc-grip', 0, 70); await a.hold(900);
+    await a.click('[data-sc-action="full"]'); await a.hold(1200);
+    await a.click('[data-sc-action="zoom-in"]', 500); await a.hold(350);
+    await a.click('[data-sc-action="zoom-in"]', 200); await a.hold(1400);
+    await a.key('Escape'); await a.hold(1000);
   } },
   export: { spec: 'systems/architecture', async play(a) {
     await a.hold(500);

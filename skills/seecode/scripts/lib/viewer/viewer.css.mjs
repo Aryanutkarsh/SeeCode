@@ -122,8 +122,20 @@ body{font-family:${FONT.sans};min-height:100vh;display:flex;justify-content:cent
 .sc-lens .sc-menu-list{left:0;right:auto}
 .sc-tip{position:absolute;pointer-events:none;z-index:6;background:var(--sc-ink);color:var(--sc-paper);font:500 11px/1.3 ${FONT.mono};padding:6px 8px;border-radius:5px;white-space:nowrap;opacity:0;transition:opacity .12s}
 .sc-tip.is-on{opacity:1}
-body.sc-embed{padding:12px;min-height:0}.sc-embed .sc-head,.sc-embed .sc-bar,.sc-embed .sc-status,.sc-embed .sc-evidence{display:none}
+/* a canvas the reader sized (grip) or full screen: the diagram fills it */
+.sc-stage.is-sized .sc-svg,.sc-full .sc-svg{width:100%;height:100%;max-height:none}
+.sc-grip{height:14px;margin-top:2px;cursor:ns-resize;display:flex;align-items:center;justify-content:center;touch-action:none;border-radius:4px}
+.sc-grip::before{content:'';width:44px;height:4px;border-radius:2px;background:var(--sc-rule-solid);transition:background .15s,width .15s}
+.sc-grip:hover::before,.sc-grip:focus-visible::before,.sc-grip.is-dragging::before{background:var(--sc-accent);width:64px}
+.sc-grip:focus-visible{outline:none}
+.sc-page.sc-full{position:fixed;inset:0;z-index:1000;max-width:none;width:auto;height:100%;display:flex;flex-direction:column;padding:14px 18px;background:var(--sc-paper);overflow:hidden}
+.sc-full .sc-head,.sc-full .sc-grip,.sc-full .sc-evidence,.sc-full .sc-caption{display:none}
+.sc-full .sc-bar{flex:none}
+.sc-full .sc-figure{flex:1;min-height:0;display:flex}
+.sc-full .sc-stage{flex:1;height:auto!important}
+.sc-full .sc-status{flex:none;min-height:0}
+body.sc-embed{padding:12px;min-height:0}.sc-embed .sc-head,.sc-embed .sc-bar,.sc-embed .sc-status,.sc-embed .sc-evidence,.sc-embed .sc-grip{display:none}
 @media (max-width:760px){.sc-panel{position:static;width:auto;max-height:none;margin:10px 0 0;box-shadow:none}}
 @media (max-width:640px){body{padding:28px 16px}.sc-search{width:110px}}
-@media print{.sc-bar,.sc-status{display:none}body{padding:0}}
+@media print{.sc-bar,.sc-status,.sc-grip{display:none}body{padding:0}}
 `;

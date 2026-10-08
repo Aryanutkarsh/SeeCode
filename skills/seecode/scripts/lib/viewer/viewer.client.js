@@ -633,9 +633,11 @@
       if (pick) return setPick(false), say('');
       if (journey) { stopJourney(); clearLit(); resetView(); say(''); return; }
       if (lensKey) { lensKey = null; clearLit(); say(''); return; }
+      if (!focus && isFull()) return setFull(false);
       setFocus(null);
       return;
     }
+    if ((ev.key === 'f' || ev.key === 'F') && !ev.metaKey && !ev.ctrlKey && !ev.altKey) { ev.preventDefault(); setFull(!isFull()); return; }
     if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') {
       const fwd = ev.key === 'ArrowRight';
       if (journey) { ev.preventDefault(); journeyStep(journey.index + (fwd ? 1 : -1), { stop: true }); return; }
@@ -701,6 +703,53 @@
   const zoomBtn = (f) => () => zoomAt(f, stage.clientWidth / 2, stage.clientHeight / 2);
   $('[data-sc-action="zoom-in"]') && $('[data-sc-action="zoom-in"]').addEventListener('click', zoomBtn(1.25));
   $('[data-sc-action="zoom-out"]') && $('[data-sc-action="zoom-out"]').addEventListener('click', zoomBtn(0.8));
+
+  // ---- canvas size: drag grip + full screen ---------------------------------
+  // The page caps the diagram at 82vh; zooming in then leaves little room. The
+  // grip below the stage makes the canvas taller (the diagram scales to fill
+  // it), and full screen gives it the whole display.
+  const page = $('.sc-page');
+  const grip = $('.sc-grip');
+  const MIN_H = 160;
+  function sizeStage(h) {
+    if (h == null) { stage.style.height = ''; stage.classList.remove('is-sized'); }
+    else { stage.style.height = Math.max(MIN_H, Math.round(h)) + 'px'; stage.classList.add('is-sized'); }
+    resetView(false);
+  }
+  if (grip) {
+    let g = null;
+    grip.addEventListener('pointerdown', (ev) => {
+      g = { y: ev.clientY, h: stage.clientHeight };
+      grip.setPointerCapture(ev.pointerId);
+      grip.classList.add('is-dragging');
+      ev.preventDefault();
+    });
+    grip.addEventListener('pointermove', (ev) => { if (g) sizeStage(g.h + ev.clientY - g.y); });
+    const end = () => { g = null; grip.classList.remove('is-dragging'); };
+    grip.addEventListener('pointerup', end);
+    grip.addEventListener('pointercancel', end);
+    grip.addEventListener('dblclick', () => sizeStage(null));
+    grip.addEventListener('keydown', (ev) => {
+      if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); sizeStage(stage.clientHeight + (ev.key === 'ArrowDown' ? 40 : -40)); }
+      else if (ev.key === 'Home') { ev.preventDefault(); sizeStage(null); }
+    });
+  }
+  const fullBtn = $('[data-sc-action="full"]');
+  const isFull = () => !!page && page.classList.contains('sc-full');
+  function setFull(on) {
+    if (!page || on === isFull()) return;
+    page.classList.toggle('sc-full', on);
+    document.documentElement.style.overflow = on ? 'hidden' : '';
+    if (fullBtn) { fullBtn.setAttribute('aria-pressed', String(on)); fullBtn.textContent = on ? 'Exit full screen' : 'Full screen'; }
+    // the native API when the browser allows it (not in a sandboxed iframe or
+    // iOS Safari); otherwise the fixed overlay above still fills the window
+    if (on && page.requestFullscreen && !document.fullscreenElement) page.requestFullscreen().catch(() => {});
+    if (!on && document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+    resetView(false);
+    say(on ? 'Full screen: Esc or F to exit' : '');
+  }
+  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && isFull()) setFull(false); });
+  if (fullBtn) fullBtn.addEventListener('click', () => setFull(!isFull()));
 
   // ---- export --------------------------------------------------------------
   // Everything here runs in the viewer's own browser: no server, no install.

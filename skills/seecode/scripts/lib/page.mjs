@@ -58,6 +58,7 @@ export function buildPage({ spec, result, preset, typeName, settings = {} }) {
     interactive ? '<div class="sc-menu sc-lens"><button class="sc-btn" data-sc-action="lens" aria-haspopup="true" title="Highlight one kind">Lens</button><div class="sc-menu-list" role="menu"></div></div>' : '',
     '<button class="sc-btn" data-sc-action="map" aria-pressed="false" title="Overview map">Map</button>',
     '<button class="sc-btn" data-sc-action="zoom-out" title="Zoom out" aria-label="Zoom out">−</button><button class="sc-btn" data-sc-action="zoom-in" title="Zoom in" aria-label="Zoom in">+</button>',
+    '<button class="sc-btn" data-sc-action="full" aria-pressed="false" title="Full screen (F)">Full screen</button>',
     spec.skin === 'terminal' ? '' : '<button class="sc-btn sc-theme" data-sc-action="theme" role="switch" aria-checked="false" title="Dark mode"><span class="sc-switch" aria-hidden="true"></span>Dark</button>',
     '<div class="sc-menu sc-export"><button class="sc-btn" data-sc-action="export" aria-haspopup="true">Export</button><div class="sc-menu-list" role="menu">'
       + '<button data-sc-export="png" role="menuitem">PNG</button><button data-sc-export="jpeg" role="menuitem">JPEG</button>'
@@ -106,6 +107,7 @@ ${spec.subtitle ? `<p class="sc-subtitle">${esc(spec.subtitle)}</p>` : ''}
 <figure class="sc-figure">
 <div class="sc-stage">${svg}<div class="sc-tip" aria-hidden="true"></div>
 <aside class="sc-panel" hidden aria-live="polite"></aside></div>
+<div class="sc-grip" role="separator" aria-orientation="horizontal" aria-label="Resize canvas: drag, or use the arrow keys; double-click to reset" tabindex="0"></div>
 ${spec.caption ? `<figcaption class="sc-caption">${esc(spec.caption)}</figcaption>` : ''}
 </figure>
 <p class="sc-status" role="status" aria-live="polite"></p>

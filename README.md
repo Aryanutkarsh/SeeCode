@@ -144,6 +144,10 @@ Every HTML diagram is one self-contained file you can explore. Send it to anyone
   <td width="50%" valign="top"><img src="docs/features/step.gif" alt="Stepping through a sequence diagram one message at a time" /><br><b>Step through it</b><br><sub>Use <kbd>←</kbd> <kbd>→</kbd> to walk the diagram's build-up one step at a time, which is ideal for presenting.</sub></td>
   <td width="50%" valign="top"><img src="docs/features/export.gif" alt="Switching to dark theme and opening the export menu" /><br><b>Theme it, export it</b><br><sub>Flip the dark-mode switch. The Export menu saves PNG, JPEG, SVG, GIF and MP4 straight from the page, with nothing installed.</sub></td>
 </tr>
+<tr>
+  <td width="50%" valign="top"><img src="docs/features/canvas.gif" alt="Dragging the grip to make the canvas taller, then zooming in full screen" /><br><b>Give it room</b><br><sub>Drag the grip under the diagram to make the canvas taller, or press <b>Full screen</b> (<kbd>F</kbd>) to zoom and pan across the whole display. <kbd>Esc</kbd> brings you back.</sub></td>
+  <td width="50%" valign="top"></td>
+</tr>
 </table>
 
 Also: a dark-mode switch, search, pan and zoom, a clickable overview map, and links that reopen a view (`#focus=api`, `#route=web,db`). <kbd>Esc</kbd> clears focus, routes and lenses, and reduced-motion settings are respected.
