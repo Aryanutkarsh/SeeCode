@@ -23,6 +23,7 @@ Each file in the JSON result reports `width`, `height` and `scale`. The HTML's o
 
 - **Static formats** (png, jpeg, webp, svg) capture the settled end frame. **Animated formats** (gif, mp4, webm) step the page's own CSS animations frame by frame, so the output is identical on every run, and frames are captured at the final size (no resampling).
 - **Requirements:** Node ≥ 20 and a Chrome-family browser for raster/animated formats. Nothing to install: the encoders are bundled. System ffmpeg is used only if the browser lacks H.264.
+- **Offline or behind a proxy:** if web fonts don't load within 15 s, export finishes with fallback fonts and adds a `W_FONTS` warning instead of hanging. Retry online for the real typography, or set `SEECODE_LOAD_TIMEOUT_MS` to wait longer.
 - `SC doctor` reports anything that's missing.
 
 **Where each format comes from**

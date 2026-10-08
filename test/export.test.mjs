@@ -101,3 +101,21 @@ test('export size adapts to the content', { skip, timeout: 60000 }, async () => 
     await browser.close();
   }
 });
+
+test('a font request that never answers stalls export for the cap, not forever', { skip, timeout: 60000 }, async (t) => {
+  const { createServer } = await import('node:http');
+  const held = [];
+  const server = createServer((req, res) => held.push(res)); // never responds
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  t.after(() => { held.forEach((res) => res.destroy()); server.close(); delete process.env.SEECODE_LOAD_TIMEOUT_MS; });
+  process.env.SEECODE_LOAD_TIMEOUT_MS = '1500';
+  const dir = mkdtempSync(join(tmpdir(), 'sc-export-stall-'));
+  const r = renderSpec({ type: 'architecture', title: 'Stall', nodes: [{ id: 'a', label: 'A', row: 0, col: 0 }], edges: [] });
+  const html = join(dir, 'x.html');
+  writeFileSync(html, r.html.replace(/(<link id="sc-fonts" rel="stylesheet" href=")[^"]*/, `$1http://127.0.0.1:${server.address().port}/css`));
+  const t0 = Date.now();
+  const out = await exportDiagram(html, { formats: 'png', scale: 1 });
+  assert.equal(out.ok, true, JSON.stringify(out));
+  assert.ok(Date.now() - t0 < 25000, 'export did not wait for the held request');
+  assert.ok(out.warnings.some((w) => w.startsWith('W_FONTS')), JSON.stringify(out.warnings));
+});

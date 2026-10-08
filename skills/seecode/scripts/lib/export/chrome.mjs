@@ -7,6 +7,10 @@ import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir, platform } from 'node:os';
 import { join } from 'node:path';
 
+// how long export waits for web fonts and other subresources before it
+// captures with fallback typography
+export const loadCap = () => Number(process.env.SEECODE_LOAD_TIMEOUT_MS) || 15000;
+
 const CANDIDATES = {
   darwin: [
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
@@ -102,11 +106,25 @@ class Page {
     await this.setViewportSize(this.viewport);
     return true;
   }
-  async goto(url) {
-    const loaded = this.cdp.once('Page.loadEventFired', this.sid);
-    const r = await this.send('Page.navigate', { url });
-    if (r.errorText) throw new Error(`navigation failed: ${r.errorText}`);
-    await loaded;
+  // Resolves on the load event. If that takes more than `cap` ms (a proxy
+  // holding the web-font stylesheet open blocks even DOMContentLoaded), the
+  // page is reloaded with remote requests blocked so it finishes with fallback
+  // fonts, and { stalled: true } lets the caller say so instead of hanging.
+  async goto(url, { cap = loadCap() } = {}) {
+    const load = async (timeout) => {
+      const loaded = this.cdp.once('Page.loadEventFired', this.sid, timeout);
+      loaded.catch(() => {});
+      const r = await this.send('Page.navigate', { url });
+      if (r.errorText) throw new Error(`navigation failed: ${r.errorText}`);
+      return loaded;
+    };
+    const ok = await load(cap).then(() => true, () => false);
+    if (ok) return { stalled: false };
+    await this.send('Page.stopLoading').catch(() => {});
+    await this.send('Network.enable');
+    await this.send('Network.setBlockedURLs', { urls: ['http://*', 'https://*'] });
+    await load(30000);
+    return { stalled: true };
   }
   // evaluate(fn, arg) like Playwright: fn is serialized, arg passed as JSON
   async evaluate(fn, arg) {
@@ -180,7 +198,15 @@ async function launchPlaywright() {
       p.on('pageerror', (e) => errors.push(e.message));
       return {
         errors,
-        goto: (url) => p.goto(url, { waitUntil: 'load' }),
+        goto: async (url, { cap = loadCap() } = {}) => {
+          try { await p.goto(url, { waitUntil: 'load', timeout: cap }); return { stalled: false }; }
+          catch (e) {
+            if (e?.name !== 'TimeoutError') throw e;
+            await p.route(/^https?:/, (route) => route.abort());
+            await p.goto(url, { waitUntil: 'load' });
+            return { stalled: true };
+          }
+        },
         evaluate: (fn, arg) => p.evaluate(fn, arg),
         addStyleTag: (o) => p.addStyleTag(o),
         setViewportSize: (v) => p.setViewportSize(v),

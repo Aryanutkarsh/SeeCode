@@ -88,8 +88,9 @@ export async function exportDiagram(htmlPath, rawFlags = {}) {
   try {
     const page = await browser.newPage({ viewport: { width: 1360, height: 900 }, deviceScaleFactor: scale || 2, colorScheme: theme });
     const errors = page.errors;
-    await page.goto(`${pathToFileURL(htmlPath).href}?theme=${theme}`);
-    await page.evaluate(() => document.fonts.ready);
+    const nav = await page.goto(`${pathToFileURL(htmlPath).href}?theme=${theme}`);
+    const fontsOk = await page.evaluate((cap) => Promise.race([document.fonts.ready.then(() => true), new Promise((r) => setTimeout(() => r(false), cap))]), 5000);
+    if (nav?.stalled || !fontsOk) warnings.push('W_FONTS: web fonts did not load in time (offline or a proxy holding the request); captured with fallback fonts. Retry online, or raise SEECODE_LOAD_TIMEOUT_MS');
     await page.addStyleTag({ content: '.sc-bar,.sc-status,.sc-evidence{display:none!important}body{padding:0!important;min-height:0!important;display:block!important}.sc-page{padding:36px 40px 32px;max-width:none!important;background:var(--sc-paper)}.sc-svg{max-height:none!important}' });
     // lay the diagram out 1:1 (one viewBox unit = one CSS px, so font sizes are
     // true sizes); the pixel ratio then comes from the content-aware plan
