@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { importFile, detect } from '../skills/seecode/scripts/lib/importers/import.mjs';
 import { renderSpec } from '../skills/seecode/scripts/lib/render.mjs';
+import { parseDrawio, parseExcalidraw, MAX_CELLS } from '../skills/seecode/scripts/lib/importers/canvas.mjs';
 
 const FIX = fileURLToPath(new URL('./fixtures/', import.meta.url));
 const out = mkdtempSync(join(tmpdir(), 'sc-import-'));
@@ -49,4 +50,36 @@ test('labels from imported files are data: tags stripped, length capped', () => 
   const r = importFile(join(FIX, 'board.drawio'), { out: join(out, 'b.json') });
   const spec = JSON.parse(readFileSync(r.draft, 'utf8'));
   assert.ok(spec.nodes.every((n) => !/[<>]/.test(n.label) && n.label.length <= 40));
+});
+
+const cell = (id, attrs, geo = 'x="0" y="0" width="80" height="40"') => `<mxCell id="${id}" ${attrs}><mxGeometry ${geo} as="geometry"/></mxCell>`;
+const board = (cells) => `<mxfile><diagram><mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/>${cells.join('')}</root></mxGraphModel></diagram></mxfile>`;
+
+test('draw.io: a cyclic parent chain imports instead of hanging', () => {
+  const m = parseDrawio(board([cell('a', 'value="A" vertex="1" parent="b"'), cell('b', 'value="B" vertex="1" parent="a"')]));
+  assert.equal(m.error, undefined);
+  assert.equal(m.nodes.length, 2);
+});
+
+test('draw.io: repeated ids, bad geometry and oversized pages are clear errors', () => {
+  assert.match(parseDrawio(board([cell('a', 'value="A" vertex="1" parent="1"'), cell('a', 'value="B" vertex="1" parent="1"')])).error, /repeats cell id "a"/);
+  assert.match(parseDrawio(board([cell('a', 'value="A" vertex="1" parent="1"', 'x="1e400" y="0" width="80" height="40"')])).error, /geometry/);
+  const many = Array.from({ length: MAX_CELLS + 1 }, (_, i) => `<mxCell id="c${i}" parent="1"/>`);
+  assert.match(parseDrawio(board(many)).error, /limit/);
+});
+
+test('draw.io: edge direction follows the arrowheads', () => {
+  const m = parseDrawio(board([
+    cell('a', 'value="A" vertex="1" parent="1"'), cell('b', 'value="B" vertex="1" parent="1"', 'x="200" y="0" width="80" height="40"'),
+    '<mxCell id="e1" edge="1" source="a" target="b" style="startArrow=classic;endArrow=none;" parent="1"/>',
+    '<mxCell id="e2" edge="1" source="a" target="b" style="endArrow=none;" parent="1"/>',
+  ]));
+  assert.deepEqual(m.edges.map((e) => [e.from, e.to, e.kind]), [['b', 'a', undefined], ['a', 'b', 'muted']]);
+});
+
+test('excalidraw: repeated element ids are rejected; containerId text still labels a shape', () => {
+  const rect = (id, x) => ({ id, type: 'rectangle', x, y: 0, width: 100, height: 50 });
+  assert.match(parseExcalidraw({ elements: [rect('r', 0), rect('r', 200)] }).error, /repeats element id "r"/);
+  const m = parseExcalidraw({ elements: [rect('r', 0), { id: 't', type: 'text', text: 'Hello', containerId: 'r', x: 0, y: 0, width: 40, height: 20 }] });
+  assert.deepEqual(m.nodes.map((n) => n.label), ['Hello']);
 });

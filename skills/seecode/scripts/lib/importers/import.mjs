@@ -193,7 +193,7 @@ export function importFile(path, flags = {}) {
   } catch (e) {
     return { ok: false, error: `parse failed: ${String(e.message).split('\n')[0]}`, fix: 'read the file yourself and write a spec by hand (say no parser was used)' };
   }
-  if (!model || model.error) return { ok: false, error: model?.error || 'nothing parsed', fix: 'read the file yourself and write a spec by hand' };
+  if (!model || model.error) return { ok: false, error: model?.error || 'nothing parsed', fix: model?.fix || 'read the file yourself and write a spec by hand' };
   if (model.note) notes.push(model.note);
   if (model.dropped) notes.push(`${model.dropped} column(s) beyond 12 per table were dropped`);
   if (model.ops) notes.push(`${model.ops} operations grouped by tag`);

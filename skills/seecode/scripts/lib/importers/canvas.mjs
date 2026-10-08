@@ -4,6 +4,11 @@
 import { inflateRawSync, inflateSync } from 'node:zlib';
 import { clean, safeId, gridFromPositions } from './common.mjs';
 
+// Generous ceilings: real boards are far smaller; a file past these is
+// malformed or hostile, and parsing it would only burn memory.
+export const MAX_CELLS = 20000;
+const num = (v) => { const n = Number(v || 0); return Number.isFinite(n) && Math.abs(n) < 1e7 ? n : NaN; };
+
 function xmlAttrs(tag) {
   const a = {};
   for (const m of tag.matchAll(/([\w:-]+)="([^"]*)"/g)) a[m[1]] = m[2].replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#10;/g, ' ').replace(/&amp;/g, '&');
@@ -57,21 +62,33 @@ export function parseDrawio(xmlIn) {
     const a = xmlAttrs(m[1]);
     const g = m[2] && m[2].match(/<mxGeometry\b([^>]*)/);
     const geo = g ? xmlAttrs(g[1]) : {};
-    return { ...a, x: Number(geo.x || 0), y: Number(geo.y || 0), w: Number(geo.width || 0), h: Number(geo.height || 0) };
+    return { ...a, x: num(geo.x), y: num(geo.y), w: num(geo.width), h: num(geo.height) };
   });
   // also <UserObject label=...><mxCell .../></UserObject>
   for (const m of xml.matchAll(/<(?:UserObject|object)\b([^>]*)>\s*<mxCell\b([^>]*?)(?:\/>|>([\s\S]*?)<\/mxCell>)/g)) {
     const o = xmlAttrs(m[1]), c = xmlAttrs(m[2]);
     const g = m[3] && m[3].match(/<mxGeometry\b([^>]*)/);
     const geo = g ? xmlAttrs(g[1]) : {};
-    cells.push({ ...c, id: o.id, value: o.label, x: Number(geo.x || 0), y: Number(geo.y || 0), w: Number(geo.width || 0), h: Number(geo.height || 0) });
+    cells.push({ ...c, id: o.id, value: o.label, x: num(geo.x), y: num(geo.y), w: num(geo.width), h: num(geo.height) });
+  }
+  if (cells.length > MAX_CELLS) return { error: `draw.io page has ${cells.length} cells (limit ${MAX_CELLS})`, fix: 'export just the page or region you want drawn, then import that' };
+  const bad = cells.find((c) => c.vertex === '1' && [c.x, c.y, c.w, c.h].some(Number.isNaN));
+  if (bad) return { error: `draw.io cell "${clean(bad.id, 24)}" has non-numeric or out-of-range geometry`, fix: 'fix or delete that shape in draw.io, then import again' };
+  const seen = new Set();
+  for (const c of cells) {
+    if (c.id === undefined) continue;
+    if (seen.has(c.id)) return { error: `draw.io file repeats cell id "${clean(c.id, 24)}"`, fix: 'give each shape a unique id (re-save from draw.io), then import again' };
+    seen.add(c.id);
   }
   const byId = new Map(cells.map((c) => [c.id, c]));
   const map = new Map(), used = new Set();
   const containers = new Set(cells.filter((c) => c.vertex === '1' && /swimlane|group|container=1/.test(c.style || '')).map((c) => c.id));
+  // child geometry is relative to its parent vertex; a cyclic parent chain
+  // (only in hand-edited or hostile files) is cut at the first repeat
   const abs = (c) => {
     let x = c.x, y = c.y, p = byId.get(c.parent);
-    while (p && p.vertex === '1') { x += p.x; y += p.y; p = byId.get(p.parent); }
+    const chain = new Set([c.id]);
+    while (p && p.vertex === '1' && !chain.has(p.id)) { chain.add(p.id); x += p.x; y += p.y; p = byId.get(p.parent); }
     return { x, y };
   };
   const groups = [...containers].map((id) => ({ id: safeId(`g_${id}`, map, used), src: id, label: clean(byId.get(id).value || 'Group', 32) }));
@@ -97,10 +114,14 @@ export function parseDrawio(xmlIn) {
   const edges = [];
   for (const c of cells) {
     if (c.edge !== '1') continue;
-    const a = idOf.get(c.source), b = idOf.get(c.target);
+    let a = idOf.get(c.source), b = idOf.get(c.target);
     if (!a || !b) continue;
+    const st = c.style || '';
+    // draw.io's default end is an arrow; direction follows the arrowheads
+    const start = /startArrow=(?!none)/.test(st), end = !/endArrow=none/.test(st);
+    if (start && !end) [a, b] = [b, a];
     const label = clean(c.value || cells.find((x) => x.parent === c.id && x.value)?.value || '', 28);
-    edges.push({ from: a, to: b, ...(label ? { label } : {}), ...(/dashed=1/.test(c.style || '') ? { kind: 'async' } : {}), ...(/startArrow=(?!none)/.test(c.style || '') && /endArrow=(?!none)/.test(c.style || '') ? { both: true } : {}) });
+    edges.push({ from: a, to: b, ...(label ? { label } : {}), ...(/dashed=1/.test(st) ? { kind: 'async' } : {}), ...(start && end ? { both: true } : {}), ...(!start && !end ? { kind: 'muted' } : {}) });
   }
   gridFromPositions(nodes);
   const pageName = (xmlIn.match(/<diagram[^>]*name="([^"]*)"/) || [])[1];
@@ -109,11 +130,18 @@ export function parseDrawio(xmlIn) {
 
 export function parseExcalidraw(json) {
   const doc = typeof json === 'string' ? JSON.parse(json) : json;
-  const els = (doc.elements || []).filter((e) => !e.isDeleted);
-  const byId = new Map(els.map((e) => [e.id, e]));
+  const els = (doc.elements || []).filter((e) => e && !e.isDeleted);
+  if (els.length > MAX_CELLS) return { error: `Excalidraw board has ${els.length} elements (limit ${MAX_CELLS})`, fix: 'copy just the region you want drawn into a new board, then import that' };
+  const byId = new Map();
+  for (const e of els) {
+    // a repeated id would fold the same bound text into many nodes
+    if (byId.has(e.id)) return { error: `Excalidraw board repeats element id "${clean(e.id, 24)}"`, fix: 'copy the shapes into a fresh board (Excalidraw re-ids them on paste), then import again' };
+    byId.set(e.id, e);
+  }
   const map = new Map(), used = new Set();
   const textFor = (e) => {
-    const bound = (e.boundElements || []).map((b) => byId.get(b.id)).find((b) => b && b.type === 'text');
+    const bound = (e.boundElements || []).map((b) => byId.get(b.id)).find((b) => b && b.type === 'text')
+      || els.find((t) => t.type === 'text' && t.containerId === e.id);
     return bound ? bound.text : '';
   };
   const frames = els.filter((e) => e.type === 'frame');
