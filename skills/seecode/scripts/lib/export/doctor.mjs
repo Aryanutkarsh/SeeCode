@@ -1,11 +1,17 @@
 // Environment check for exports. Nothing needs installing; this reports what
 // works and the one fix for what doesn't.
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { launchBrowser, findChrome } from './chrome.mjs';
 
 const VENDOR = fileURLToPath(new URL('../../vendor/', import.meta.url));
+const SKILL_MD = fileURLToPath(new URL('../../../SKILL.md', import.meta.url));
+
+// the installed skill's version, so "am I up to date?" has a quick answer
+function skillVersion() {
+  try { return (/^\s*version:\s*"?([^"\s]+)"?/m.exec(readFileSync(SKILL_MD, 'utf8')) || [])[1] || 'unknown'; } catch { return 'unknown'; }
+}
 
 export async function doctor() {
   const node = Number(process.versions.node.split('.')[0]);
@@ -41,5 +47,5 @@ export async function doctor() {
   checks.gif = browserOk && vendored ? 'ok' : 'unavailable';
   checks.mp4 = webcodecs ? 'ok (Chrome H.264)' : ffmpeg ? 'ok (ffmpeg)' : 'unavailable';
   if (browserOk && !webcodecs && !ffmpeg) fixes.push('for MP4 use Google Chrome (built-in H.264) or install ffmpeg');
-  return { ok: fixes.length === 0, checks, ...(fixes.length ? { fix: fixes } : {}) };
+  return { ok: fixes.length === 0, version: skillVersion(), checks, ...(fixes.length ? { fix: fixes } : {}) };
 }

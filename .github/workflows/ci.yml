@@ -21,6 +21,18 @@ jobs:
       - run: node skills/seecode/scripts/seecode.mjs doctor
       - run: npm test
 
+  # install the skill the way users do (npx skills add) and render with it
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22 # the skills installer needs >= 22.20
+      - run: node --test test/install.test.mjs
+        env:
+          SEECODE_INSTALL_TEST: '1'
+
   # versions are bumped by the Release workflow after merge, never in a PR
   version-unchanged:
     if: github.event_name == 'pull_request'

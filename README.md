@@ -285,6 +285,20 @@ Requires Node 20 or later. Check your setup with `/seecode:doctor` or `node skil
 
 </details>
 
+### Updating
+
+Every change merged to `main` ships as a new version, with a [release](https://github.com/Aryanutkarsh/seecode/releases) and a fresh `seecode.zip`. How you pick it up depends on how you installed:
+
+| Installed with | To update |
+|---|---|
+| Claude Code plugin | Automatic once auto-update is on (`/plugin` → **Marketplaces** → **seecode** → **Enable auto-update**). To update now: `/plugin` → **Marketplaces** → **seecode** → **Update** |
+| `npx skills add` | `npx skills update seecode -g` (drop `-g` for a project install). Skills installed this way don't update on their own |
+| Codex / Copilot plugin | Update the plugin from your agent's plugin manager, or run the install commands above again |
+| Claude.ai / Claude Desktop | Download `seecode.zip` from the [latest release](https://github.com/Aryanutkarsh/seecode/releases/latest) and upload it again under **Settings → Capabilities → Skills** |
+| Manual clone | `git pull` in the clone (the symlink picks it up) |
+
+Then start a new agent session: skills load when a session starts. To see which version you have, check the `version:` line at the top of the installed `SKILL.md`, or run `/seecode:doctor`.
+
 ## Learn more
 
 - [CLI reference and how the pipeline works](docs/cli.md)
