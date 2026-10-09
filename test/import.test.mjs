@@ -117,3 +117,22 @@ test('draw.io: relative geometry resolves against the parent, plus its offset', 
   const port = m.nodes.find((n) => n.label === 'Port');
   assert.deepEqual([port.x, port.y], [695, 415]);
 });
+
+test('mermaid state: repeated descriptions accumulate; an alias starts fresh', async () => {
+  const { parseMermaid } = await import('../skills/seecode/scripts/lib/importers/mermaid.mjs');
+  const m = parseMermaid('stateDiagram-v2\n[*] --> idle\nidle : First\nidle : Second\nbusy : Old\nstate "Busy" as busy\nbusy : New\nidle --> busy');
+  const by = Object.fromEntries(m.nodes.map((n) => [n.id, n]));
+  assert.equal(by.idle.sub, 'First · Second');
+  assert.equal(by.busy.label, 'Busy');
+  assert.equal(by.busy.sub, 'New');
+});
+
+test('mermaid state: a composite becomes a group, and its edges reach the inner entry and exit', async () => {
+  const { parseMermaid } = await import('../skills/seecode/scripts/lib/importers/mermaid.mjs');
+  const m = parseMermaid('stateDiagram-v2\n[*] --> Idle\nstate "Checking out" as Checkout {\n[*] --> Cart\nCart --> Payment\nPayment --> [*]\n}\nIdle --> Checkout\nCheckout --> Done');
+  assert.deepEqual(m.groups, [{ id: 'g_Checkout', label: 'Checking out' }]);
+  assert.deepEqual(m.nodes.filter((n) => n.group).map((n) => n.id), ['Cart', 'Payment']);
+  assert.ok(!m.nodes.some((n) => n.id === 'Checkout'), 'the composite is not also a leaf box');
+  const pairs = m.edges.map((e) => `${e.from}>${e.to}`);
+  assert.ok(pairs.includes('Idle>Cart') && pairs.includes('Payment>Done'), pairs.join(' '));
+});

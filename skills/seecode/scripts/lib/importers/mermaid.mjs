@@ -159,28 +159,65 @@ function state(L, title) {
   const map = new Map(), used = new Set();
   const nodes = new Map();
   const edges = [];
+  const groups = [];
+  const comp = new Map(); // composite id -> { group, entry, exit }
+  const stack = []; // open composites, innermost last
+  const descs = new Map(); // id -> description lines, in order
   const ensure = (raw) => {
     if (raw === '[*]') return null;
     const id = safeId(raw, map, used);
-    if (!nodes.has(id)) nodes.set(id, { id, label: clean(raw) });
+    if (!nodes.has(id) && !comp.has(id)) nodes.set(id, { id, label: clean(raw), ...(stack.length ? { group: comp.get(stack[stack.length - 1]).group } : {}) });
     return id;
   };
   let startN = 0, endN = 0;
   for (const line of L) {
     let m;
-    if ((m = line.match(/^state\s+"([^"]+)"\s+as\s+(\S+)/))) { const id = ensure(m[2]); nodes.get(id).label = clean(m[1]); continue; }
-    if ((m = line.match(/^(\S+)\s*:\s*(.+)$/)) && !line.includes('-->')) { const id = ensure(m[1]); if (id) nodes.get(id).sub = clean(m[2], 40); continue; }
+    // composite: state X {  /  state "Label" as X {
+    if ((m = line.match(/^state\s+(?:"([^"]+)"\s+as\s+)?([\w.-]+)\s*\{$/))) {
+      const id = safeId(m[2], map, used);
+      const gid = safeId(`g_${m[2]}`, map, used);
+      groups.push({ id: gid, label: clean(m[1] || m[2], 32) });
+      comp.set(id, { group: gid, entry: null, exit: null });
+      nodes.delete(id); // a forward reference made it a leaf; it is a group
+      stack.push(id);
+      continue;
+    }
+    if (line === '}' && stack.length) { stack.pop(); continue; }
+    // alias: a new display name starts a fresh description
+    if ((m = line.match(/^state\s+"([^"]+)"\s+as\s+(\S+)$/))) { const id = ensure(m[2]); if (nodes.has(id)) { nodes.get(id).label = clean(m[1]); descs.delete(id); } continue; }
+    // descriptions accumulate: idle : First / idle : Second
+    if ((m = line.match(/^(\S+)\s*:\s*(.+)$/)) && !line.includes('-->')) {
+      const id = ensure(m[1]);
+      if (id && nodes.has(id)) descs.set(id, [...(descs.get(id) || []), clean(m[2], 40)]);
+      continue;
+    }
     if ((m = line.match(/^(\S+)\s*-->\s*(\S+)\s*(?::\s*(.*))?$/))) {
-      let a = m[1] === '[*]' ? `__start${startN++ ? startN : ''}` : ensure(m[1]);
-      let b = m[2] === '[*]' ? `__end${endN++ ? endN : ''}` : ensure(m[2]);
+      const inside = stack.length ? comp.get(stack[stack.length - 1]) : null;
+      // [*] inside a composite marks its entry and exit, not a new start/end dot
+      if (inside && m[1] === '[*]') { inside.entry = ensure(m[2]); continue; }
+      if (inside && m[2] === '[*]') { inside.exit = ensure(m[1]); continue; }
+      const a = m[1] === '[*]' ? `__start${startN++ ? startN : ''}` : ensure(m[1]);
+      const b = m[2] === '[*]' ? `__end${endN++ ? endN : ''}` : ensure(m[2]);
       if (m[1] === '[*]') nodes.set(a, { id: a, shape: 'start' });
       if (m[2] === '[*]') nodes.set(b, { id: b, shape: 'end' });
       edges.push({ from: a, to: b, label: m[3] ? clean(m[3], 28) : undefined });
     }
   }
-  return { kind: 'graph', hint: 'state', title, dir: 'LR', nodes: [...nodes.values()].map((n) => ({ ...n, id: n.id.replace(/^__/, '') })), edges: edges.map((e) => ({ ...e, from: e.from.replace(/^__/, ''), to: e.to.replace(/^__/, '') })) };
+  for (const [id, d] of descs) if (nodes.has(id)) nodes.get(id).sub = clean(d.join(' · '), 60);
+  // edges to or from a composite attach to its entry / exit state
+  const firstIn = (g) => [...nodes.values()].find((n) => n.group === g)?.id;
+  const into = (id) => (comp.has(id) ? comp.get(id).entry || firstIn(comp.get(id).group) : id);
+  const outOf = (id) => (comp.has(id) ? comp.get(id).exit || comp.get(id).entry || firstIn(comp.get(id).group) : id);
+  const strip = (id) => id.replace(/^__/, '');
+  const out = edges.map((e) => ({ ...e, from: outOf(e.from), to: into(e.to) })).filter((e) => e.from && e.to);
+  const used2 = new Set([...nodes.values()].map((n) => n.group).filter(Boolean));
+  return {
+    kind: 'graph', hint: 'state', title, dir: 'LR',
+    nodes: [...nodes.values()].map((n) => ({ ...n, id: strip(n.id) })),
+    edges: out.map((e) => ({ ...e, from: strip(e.from), to: strip(e.to) })),
+    groups: groups.filter((g) => used2.has(g.id)),
+  };
 }
-
 
 function er(L, title) {
   const map = new Map(), used = new Set();

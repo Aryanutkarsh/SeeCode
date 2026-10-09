@@ -13,7 +13,7 @@ Next, render the draft and refine the layout with `--patch` (`row`/`col`). Only 
 | Mermaid flowchart/graph | flowchart |
 | Mermaid sequence | sequence |
 | Mermaid class | uml-class |
-| Mermaid state | state |
+| Mermaid state | state (composite `state X { … }` becomes a group; repeated `X : note` lines are all kept) |
 | Mermaid er | er |
 | Mermaid gantt | gantt |
 | Mermaid journey | journey |
