@@ -121,6 +121,8 @@ export const DIAGRAM_CSS = `
 .k-muted .n-box{fill:var(--sc-store);stroke:var(--sc-rule-solid)}
 .n-label{fill:var(--sc-ink);font-size:12px;font-weight:600}
 .n-sub{fill:var(--sc-muted);font-family:${FONT.mono};font-size:9px}
+.n-icon{fill:none;stroke:var(--sc-muted);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.k-focal .n-icon{stroke:var(--sc-accent)}
 .n-tag{fill:var(--sc-soft);font-family:${FONT.mono};font-size:7px;letter-spacing:.12em;text-transform:uppercase}
 .n-tag-box{fill:none;stroke:var(--sc-rule-solid);stroke-width:.8}
 .k-focal .n-tag{fill:var(--sc-accent)}

@@ -8,6 +8,7 @@
       "items": {
         "type": "object", "required": ["id", "label"], "additionalProperties": false,
         "properties": {
+          "icon": { "enum": ["calendar", "clock", "person", "people", "briefcase", "home", "money", "card", "cart", "document", "flag", "check", "mail", "phone", "chat", "plane", "car", "heart", "star", "moon", "sun", "gift", "pin", "key", "server", "database", "cloud", "lock", "code", "gear"] },
           "id": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_.-]*$" },
           "label": { "type": "string", "maxLength": 32 },
           "sub": { "type": "string", "maxLength": 40 },

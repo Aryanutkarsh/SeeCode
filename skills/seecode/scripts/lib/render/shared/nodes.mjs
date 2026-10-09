@@ -4,6 +4,7 @@
 import { el, text } from '../../svg.mjs';
 import { textWidth, ceil4, wrap } from '../../text.mjs';
 import { TYPE } from '../../tokens.mjs';
+import { hasIcon, drawIcon, ICON_ROOM, ICON_SIZE } from './icons.mjs';
 
 const LABEL = { size: TYPE.label, weight: 600 };
 const SUB = { size: TYPE.sub, mono: true };
@@ -68,16 +69,17 @@ export function sizeNode(n, { minW = MIN_W, maxW = MAX_W } = {}) {
     n.lines = [n.label];
     return n;
   }
+  const room = hasIcon(n) ? ICON_ROOM : 0; // an icon sits left of the label
   const lw = textWidth(n.label, LABEL);
   let lines = [n.label];
   let inner = lw;
-  if (lw > maxW - 32) {
-    lines = wrap(n.label, maxW - 32, LABEL).slice(0, 2);
+  if (lw > maxW - 32 - room) {
+    lines = wrap(n.label, maxW - 32 - room, LABEL).slice(0, 2);
     inner = Math.max(...lines.map((l) => textWidth(l, LABEL)));
   }
   const sw = n.sub ? textWidth(n.sub, SUB) : 0;
   const tw = n.tag ? textWidth(n.tag, TAG) + 10 : 0;
-  inner = Math.max(inner, sw, tw ? tw * 2 + 8 : 0);
+  inner = Math.max(inner + room, sw + room, tw ? tw * 2 + 8 : 0);
   let w = ceil4(Math.max(minW, inner + 32));
   const extra = (lines.length - 1) * 15;
   let h = (n.tag ? 64 : n.sub ? 52 : 40) + extra;
@@ -191,12 +193,21 @@ export function drawNode(n, { step, extraClass = '', attrs = {} } = {}) {
     }
     const lines = n.lines || [n.label];
     const block = lines.length * 15 + (n.sub ? 14 : 0) - 3;
-    let y = top + (n.y + n.h - top) / 2 - block / 2 + 11;
+    const mid = top + (n.y + n.h - top) / 2;
+    let y = mid - block / 2 + 11;
+    // with an icon, icon + text are centred together as one group
+    let tx = cx;
+    if (hasIcon(n)) {
+      const inner = Math.max(...lines.map((l) => textWidth(l, LABEL)), n.sub ? textWidth(n.sub, SUB) : 0);
+      const left = cx - (ICON_ROOM + inner) / 2;
+      parts.push(drawIcon(n.icon, left, mid - ICON_SIZE / 2));
+      tx = left + ICON_ROOM + inner / 2;
+    }
     for (const line of lines) {
-      parts.push(text({ class: 'n-label', x: cx, y, 'text-anchor': 'middle' }, line));
+      parts.push(text({ class: 'n-label', x: tx, y, 'text-anchor': 'middle' }, line));
       y += 15;
     }
-    if (n.sub) parts.push(text({ class: 'n-sub', x: cx, y: y + 0.5, 'text-anchor': 'middle' }, n.sub));
+    if (n.sub) parts.push(text({ class: 'n-sub', x: tx, y: y + 0.5, 'text-anchor': 'middle' }, n.sub));
   }
   if (n.status) parts.push(el('circle', { class: `n-status st-${n.status}`, cx: n.x + n.w - 9, cy: n.y + 9, r: 3.5 }));
   if (n.change === 'added') parts.push(text({ class: 'n-change', x: n.x + n.w - 8, y: n.y - 5, 'text-anchor': 'end' }, '+ NEW'));

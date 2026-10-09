@@ -12,6 +12,8 @@
 - `legend`: `false` hides it, `true` forces it. Rename or hide entries, and retitle it, with an object: `{"title":"Key","entries":{"backend":{"label":"Holiday"},"async":{"label":"Reminder"},"store":{"visible":false}}}`. Keys are node kinds, edge kinds, statuses, changes or series names; an unknown key gives `W_LEGEND_KEY` listing the valid ones. The viewer's Lens menu and detail panel use the same names.
 - `evidence`: `[{id,file,line?,note?}]`.
 
+**Node icons** (graph types, sequence participants, tree nodes): `"icon": "calendar"` draws a small line icon left of the label on box, state, terminal and io shapes. Decorative only; it never changes kind or colour. Good for everyday diagrams. Names: `calendar`, `clock`, `person`, `people`, `briefcase`, `home`, `money`, `card`, `cart`, `document`, `flag`, `check`, `mail`, `phone`, `chat`, `plane`, `car`, `heart`, `star`, `moon`, `sun`, `gift`, `pin`, `key`, `server`, `database`, `cloud`, `lock`, `code`, `gear`.
+
 - `out`: the output path, relative to the spec.
 
 **Problems**: `{code,at,msg,fix}`.
