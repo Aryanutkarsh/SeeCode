@@ -1,6 +1,6 @@
 {
   "name": "seecode",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "license": "MIT",
   "private": true,
   "description": "Animated, explorable diagrams for Claude and other coding agents, from a short JSON spec.",
