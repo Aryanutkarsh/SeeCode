@@ -38,3 +38,21 @@ test('waterfall sums decimals exactly and flags a total that disagrees', () => {
   const bad = renderSpec({ type: 'waterfall', title: 'Off', steps: [['Start', 10], ['Add', 5], { label: 'Net', total: true, value: 16 }] });
   assert.ok(bad.result.problems.some((p) => p.code === 'W_TOTAL'));
 });
+
+test('tiny and huge magnitudes keep a span and distinct labels', async () => {
+  const { fmt } = await import('../skills/seecode/scripts/lib/render/charts/scale.mjs');
+  for (const max of [3e-14, 0.004, 0.3, 1234567, 2e15]) {
+    const d = niceDomain(0, max);
+    assert.ok(d.hi >= max && d.hi > d.lo, `${max}: ${JSON.stringify(d)}`);
+    const labels = ticks(d).map((t) => fmt(t));
+    assert.equal(new Set(labels).size, labels.length, `${max}: ${labels}`);
+  }
+  assert.deepEqual([fmt(0.002), fmt(0.004), fmt(1e15), fmt(2.5e12), fmt(1234.567), fmt(0.1 + 0.2)], ['0.002', '0.004', '1000T', '2.5T', '1234.57', '0.3']);
+});
+
+test('charts of tiny values render real coordinates and labels', () => {
+  const bar = noNaN({ type: 'bar', title: 'Small', data: [['a', 0.002], ['b', 0.004]] });
+  assert.match(bar.html, />0\.004</);
+  noNaN({ type: 'scatter', title: 'Tiny', points: [{ label: 'a', x: 1e-14, y: 2e-14 }, { label: 'b', x: 3e-14, y: 1e-14 }] });
+  noNaN({ type: 'line', title: 'Tiny', x: ['q1', 'q2'], series: [{ name: 's', values: [1e-14, 3e-14] }] });
+});

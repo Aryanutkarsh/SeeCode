@@ -5,7 +5,7 @@ export function niceStep(range, target = 5) {
   const mag = 10 ** Math.floor(Math.log10(raw || 1));
   const n = raw / mag;
   const step = n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10;
-  return step * mag;
+  return Number((step * mag).toPrecision(12));
 }
 
 // Always includes zero and always has a span: all-zero (or empty) data
@@ -24,22 +24,23 @@ export function floorTo(dom, min) {
   return snap(Math.min(Math.floor(min / dom.step) * dom.step, dom.hi - dom.step), dom.step);
 }
 
-// drop float noise (0.30000000000000004) from a multiple of step
+// drop float noise (0.30000000000000004) from a multiple of step, at any
+// magnitude (a fixed decimal count collapses domains like 0…3e-14)
 function snap(v, step) {
-  const d = Math.max(0, -Math.floor(Math.log10(step)) + 1);
-  return Number(v.toFixed(Math.min(12, d)));
+  return Number((Math.round(v / step) * step).toPrecision(12));
 }
 
 export function ticks({ lo, hi, step }) {
   const out = [];
-  for (let v = lo; v <= hi + step / 1e6; v += step) out.push(Math.round(v * 1e6) / 1e6);
+  for (let i = 0, v = lo; v <= hi + step * 1e-9; i++, v = lo + i * step) out.push(snap(v, step));
   return out;
 }
 
 export function fmt(v, unit = '') {
   const a = Math.abs(v);
   let s;
-  if (a >= 1e9) s = `${trim(v / 1e9)}B`;
+  if (a >= 1e12) s = `${trim(v / 1e12)}T`;
+  else if (a >= 1e9) s = `${trim(v / 1e9)}B`;
   else if (a >= 1e6) s = `${trim(v / 1e6)}M`;
   else if (a >= 1e4) s = `${trim(v / 1e3)}k`;
   else s = trim(v);
@@ -48,6 +49,9 @@ export function fmt(v, unit = '') {
   return unit === '%' || unit.length <= 2 ? `${s}${unit}` : `${s} ${unit}`;
 }
 
+// two decimals from 1 up; below 1, three significant digits so 0.002 and
+// 0.004 stay distinct (and tiny values keep their exponent: 3e-14)
 function trim(v) {
-  return String(Math.round(v * 100) / 100);
+  if (Math.abs(v) >= 1 || v === 0) return String(Math.round(v * 100) / 100);
+  return String(Number(v.toPrecision(3)));
 }
