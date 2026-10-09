@@ -43,6 +43,8 @@ Plans, moves, money and applications use the same types as systems:
 | Where money goes, a budget | `sankey`, `treemap`, `waterfall` |
 | Where an application or order stands | `state`, `kanban` |
 | Weighing options | `quadrant`, `bar` |
+| Where things are in a home, shop, office or site | `isometric-plan` |
+| What something is made of (a gadget, a kit, a box) | `exploded` |
 
 Write labels in the reader's words ("Pay deposit", not "POST /deposit"), and rename the legend to match (`legend.entries`, see `spec.md`). Ask for missing personal facts (dates, amounts, rules) and never invent them; leave a clearly marked placeholder if the user wants a draft now.
 

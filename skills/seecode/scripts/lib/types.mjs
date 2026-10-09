@@ -23,6 +23,8 @@ import * as kanban from './render/structure/kanban.mjs';
 import * as storymap from './render/structure/storymap.mjs';
 import * as quadrant from './render/structure/quadrant.mjs';
 import * as matrix from './render/structure/matrix.mjs';
+import * as exploded from './render/structure/exploded.mjs';
+import * as plan from './render/structure/plan.mjs';
 
 // schema defaults to the type slug (schemas/<slug>.schema.json)
 const ch = (name, renderer, extra = {}) => ({ name, family: 'chart', renderer, ...extra });
@@ -55,6 +57,8 @@ export const TYPES = {
   loop: st('Loop', loop, { defaultMotion: 'loop' }),
   nested: st('Nested', nested),
   layers: st('Layer stack', layers),
+  exploded: st('Exploded view', exploded),
+  'isometric-plan': st('Isometric plan', plan),
   venn: st('Venn', venn),
   pyramid: st('Pyramid', pyramid),
   fishbone: st('Fishbone', fishbone, { defaultMotion: 'trace' }),

@@ -1,0 +1,548 @@
+{
+  "title": "Isometric plan",
+  "additionalProperties": false,
+  "properties": {
+    "plate": {
+      "type": "object",
+      "required": [
+        "w",
+        "d"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "number",
+          "minimum": -2000,
+          "maximum": 2000
+        },
+        "y": {
+          "type": "number",
+          "minimum": -2000,
+          "maximum": 2000
+        },
+        "w": {
+          "type": "number",
+          "minimum": 32,
+          "maximum": 4000
+        },
+        "d": {
+          "type": "number",
+          "minimum": 32,
+          "maximum": 4000
+        }
+      }
+    },
+    "rooms": {
+      "type": "array",
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "w",
+          "d"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_.-]*$"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 24
+          },
+          "sub": {
+            "type": "string",
+            "maxLength": 28
+          },
+          "x": {
+            "type": "number",
+            "minimum": -2000,
+            "maximum": 2000
+          },
+          "y": {
+            "type": "number",
+            "minimum": -2000,
+            "maximum": 2000
+          },
+          "w": {
+            "type": "number",
+            "minimum": 16,
+            "maximum": 2000
+          },
+          "d": {
+            "type": "number",
+            "minimum": 16,
+            "maximum": 2000
+          },
+          "focal": {
+            "type": "boolean"
+          },
+          "walls": {
+            "type": "boolean"
+          },
+          "door": {
+            "anyOf": [
+              {
+                "enum": [
+                  "N",
+                  "S",
+                  "E",
+                  "W"
+                ]
+              },
+              {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "N",
+                    "S",
+                    "E",
+                    "W"
+                  ]
+                },
+                "maxItems": 4
+              }
+            ]
+          },
+          "step": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          }
+        }
+      }
+    },
+    "boxes": {
+      "type": "array",
+      "maxItems": 120,
+      "items": {
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "w",
+          "d"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_.-]*$"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 24
+          },
+          "sub": {
+            "type": "string",
+            "maxLength": 28
+          },
+          "kind": {
+            "enum": [
+              "furniture",
+              "building",
+              "rack",
+              "tree",
+              "screen",
+              "display",
+              "terminal",
+              "board",
+              "pcb",
+              "battery",
+              "plate",
+              "keys",
+              "switches",
+              "cards",
+              "chip",
+              "studs",
+              "speaker",
+              "lid",
+              "vault",
+              "bun",
+              "house",
+              "housing",
+              "tray",
+              "desk",
+              "table",
+              "counter",
+              "post"
+            ]
+          },
+          "x": {
+            "type": "number",
+            "minimum": -2000,
+            "maximum": 2000
+          },
+          "y": {
+            "type": "number",
+            "minimum": -2000,
+            "maximum": 2000
+          },
+          "w": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 2000
+          },
+          "d": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 2000
+          },
+          "h": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 600
+          },
+          "focal": {
+            "type": "boolean"
+          },
+          "step": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "r": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 400
+              },
+              {
+                "enum": [
+                  "round",
+                  "inherit"
+                ]
+              }
+            ]
+          },
+          "hollow": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 200
+              }
+            ]
+          },
+          "rings": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 24,
+            "items": {
+              "$ref": "#/$defs/item"
+            }
+          },
+          "side": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "$ref": "#/$defs/side"
+            }
+          },
+          "top": {
+            "enum": [
+              "dome",
+              "gable",
+              "hip",
+              "shed"
+            ]
+          },
+          "topH": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 400
+          }
+        }
+      }
+    },
+    "marks": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "w",
+          "d"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "x": {
+            "type": "number",
+            "minimum": -2000,
+            "maximum": 2000
+          },
+          "y": {
+            "type": "number",
+            "minimum": -2000,
+            "maximum": 2000
+          },
+          "w": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 4000
+          },
+          "d": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 4000
+          },
+          "r": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 400
+          },
+          "kind": {
+            "enum": [
+              "zone",
+              "road"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "anyOf": [
+    {
+      "required": [
+        "rooms"
+      ]
+    },
+    {
+      "required": [
+        "boxes"
+      ]
+    }
+  ],
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "shape": {
+          "enum": [
+            "panel",
+            "hole",
+            "ring",
+            "lines",
+            "text",
+            "dots"
+          ]
+        },
+        "box": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 2
+          }
+        },
+        "at": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 2
+          }
+        },
+        "size": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 2
+          }
+        },
+        "r": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 400
+            },
+            {
+              "enum": [
+                "round",
+                "inherit"
+              ]
+            }
+          ]
+        },
+        "h": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 200
+        },
+        "tone": {
+          "enum": [
+            "light",
+            "dark",
+            "black",
+            "accent",
+            "mid",
+            "cut",
+            "line",
+            "text"
+          ]
+        },
+        "repeat": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 40
+            },
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 40
+            }
+          ]
+        },
+        "fill": {
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 1
+        },
+        "n": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "dir": {
+          "enum": [
+            "h",
+            "v"
+          ]
+        },
+        "dash": {
+          "type": "boolean"
+        },
+        "ragged": {
+          "type": "boolean"
+        },
+        "rings": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 24,
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "top": {
+          "enum": [
+            "dome",
+            "gable",
+            "hip",
+            "shed"
+          ]
+        },
+        "topH": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 400
+        }
+      }
+    },
+    "side": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "face": {
+          "enum": [
+            "left",
+            "right",
+            "both"
+          ]
+        },
+        "shape": {
+          "enum": [
+            "panel",
+            "lines",
+            "text",
+            "button"
+          ]
+        },
+        "box": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 2
+          }
+        },
+        "repeat": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 40
+            },
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 40
+            }
+          ]
+        },
+        "fill": {
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 1
+        },
+        "n": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "dir": {
+          "enum": [
+            "h",
+            "v"
+          ]
+        },
+        "dash": {
+          "type": "boolean"
+        },
+        "tone": {
+          "enum": [
+            "light",
+            "dark",
+            "black",
+            "accent",
+            "mid",
+            "cut",
+            "line",
+            "text"
+          ]
+        }
+      }
+    }
+  }
+}

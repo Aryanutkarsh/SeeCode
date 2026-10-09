@@ -1,0 +1,142 @@
+{
+    "type": "exploded",
+    "title": "Phone teardown",
+    "subtitle": "What sits under the glass",
+    "parts": [
+        {
+            "id": "housing",
+            "label": "Housing",
+            "sub": "aluminium frame",
+            "kind": "housing",
+            "w": 150,
+            "d": 300,
+            "t": 16,
+            "r": 26,
+            "side": [
+                {
+                    "face": "right",
+                    "shape": "button",
+                    "box": [
+                        0.55,
+                        0.35,
+                        0.7,
+                        0.75
+                    ]
+                },
+                {
+                    "face": "right",
+                    "shape": "button",
+                    "box": [
+                        0.75,
+                        0.35,
+                        0.82,
+                        0.75
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "battery",
+            "label": "Battery",
+            "sub": "li-ion cell",
+            "kind": "battery",
+            "w": 118,
+            "d": 140,
+            "t": 8,
+            "r": 6,
+            "y": 50,
+            "level": 1
+        },
+        {
+            "id": "board",
+            "label": "Logic board",
+            "sub": "soc, cameras",
+            "kind": "board",
+            "w": 118,
+            "d": 110,
+            "t": 4,
+            "r": 4,
+            "y": -80,
+            "level": 2,
+            "focal": true,
+            "items": [
+                {
+                    "box": [
+                        0.06,
+                        0.06,
+                        0.42,
+                        0.48
+                    ],
+                    "h": 5,
+                    "r": 7,
+                    "tone": "light",
+                    "items": [
+                        {
+                            "at": [
+                                0.3,
+                                0.3
+                            ],
+                            "size": [
+                                0.38,
+                                0.38
+                            ],
+                            "r": "round",
+                            "h": 2.5,
+                            "tone": "dark",
+                            "items": [
+                                {
+                                    "shape": "ring",
+                                    "box": [
+                                        0.25,
+                                        0.25,
+                                        0.75,
+                                        0.75
+                                    ],
+                                    "r": "round",
+                                    "tone": "light"
+                                }
+                            ]
+                        },
+                        {
+                            "at": [
+                                0.72,
+                                0.72
+                            ],
+                            "size": [
+                                0.38,
+                                0.38
+                            ],
+                            "r": "round",
+                            "h": 2.5,
+                            "tone": "dark",
+                            "items": [
+                                {
+                                    "shape": "ring",
+                                    "box": [
+                                        0.25,
+                                        0.25,
+                                        0.75,
+                                        0.75
+                                    ],
+                                    "r": "round",
+                                    "tone": "light"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "display",
+            "label": "Display",
+            "sub": "oled, cover glass",
+            "kind": "display",
+            "w": 150,
+            "d": 300,
+            "t": 8,
+            "r": 26,
+            "level": 3
+        }
+    ]
+}

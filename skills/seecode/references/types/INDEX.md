@@ -37,6 +37,8 @@ Pick a type, then read `types/<type>.md`.
 - `org-chart`: people and teams
 - `nested`: containment and scopes
 - `layers`: a stack
+- `exploded`: parts of one thing, lifted apart (isometric)
+- `isometric-plan`: a floor or site seen from above (isometric)
 - `venn`: overlaps
 - `pyramid`: ranking, or `funnel` for drop-off
 - `quadrant`: a 2×2
