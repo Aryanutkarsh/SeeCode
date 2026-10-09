@@ -9,6 +9,7 @@ import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildZip } from '../tools/build-zip.mjs';
+import { shippedFiles, stageShipped } from '../tools/shipped.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SKILL = join(ROOT, 'skills/seecode');
@@ -71,8 +72,8 @@ test('release zip carries exactly the source skill', { skip: hasUnzip ? false : 
   assert.equal(r.status, 0, r.stderr);
   const got = join(dir, 'x/seecode');
   assert.equal(readFileSync(join(got, 'SKILL.md'), 'utf8'), source);
-  const rel = (base) => walk(base).map((p) => relative(base, p));
-  assert.deepEqual(rel(got), rel(SKILL));
+  const rel = (base) => walk(base).map((p) => relative(base, p).split('\\').join('/')).sort();
+  assert.deepEqual(rel(got), shippedFiles('skills/seecode').map((p) => p.slice('skills/seecode/'.length)));
 });
 
 // Opt-in: downloads the `skills` installer (needs network and Node >= 22.20).
@@ -86,15 +87,26 @@ test('a real `npx skills add` installs a skill that renders', { skip: process.en
   mkdirSync(proj);
   spawnSync('git', ['init', '-q'], { cwd: proj });
   const env = { ...process.env, HOME: join(dir, 'home'), USERPROFILE: join(dir, 'home'), DO_NOT_TRACK: '1', DISABLE_TELEMETRY: '1' };
-  const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-  const listed = spawnSync(npx, ['-y', SKILLS_CLI, 'add', ROOT, '-l'], { cwd: proj, env, encoding: 'utf8' });
-  assert.equal(listed.status, 0, listed.stderr);
+  // install from the shipped files only, as from GitHub: local clutter such
+  // as the git-ignored .repos/ reference clones must not count
+  const src = stageShipped(join(dir, 'src', 'seecode'));
+  // npx is a .cmd on Windows, which Node only spawns through a shell
+  const npx = (a, cwd = proj) => spawnSync(process.platform === 'win32' ? 'npx.cmd' : 'npx', ['-y', SKILLS_CLI, ...a], { cwd, env, encoding: 'utf8', shell: process.platform === 'win32' });
   // the installer colours its output even without a TTY (as on CI)
-  assert.match(listed.stdout.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, ''), /Found 1 skill\b/, 'only seecode is exposed to installers');
-  const add = spawnSync(npx, ['-y', SKILLS_CLI, 'add', ROOT, '-a', 'claude-code', '-s', 'seecode', '-y', '--copy'], { cwd: proj, env, encoding: 'utf8' });
+  const plain = (r) => r.stdout.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, '');
+  for (const extra of [[], ['--full-depth']]) {
+    const listed = npx(['add', src, '-l', ...extra]);
+    assert.equal(listed.status, 0, listed.stderr);
+    assert.match(plain(listed), /Found 1 skill\b/, `only seecode is exposed to installers (${extra.join(' ') || 'default'})`);
+  }
+  // unfiltered --yes installs exactly seecode, nothing else
+  const add = npx(['add', src, '-a', 'claude-code', '-y', '--copy']);
   assert.equal(add.status, 0, add.stderr || add.stdout);
+  assert.deepEqual(readdirSync(join(proj, '.claude/skills')), ['seecode']);
   const installed = join(proj, '.claude/skills/seecode');
   assert.equal(readFileSync(join(installed, 'SKILL.md'), 'utf8'), source);
+  const files = (base) => walk(base).map((p) => relative(base, p).split('\\').join('/')).sort();
+  assert.deepEqual(files(installed), shippedFiles('skills/seecode').map((p) => p.slice('skills/seecode/'.length)), 'installed files are exactly the shipped skill');
   const spec = join(dir, 'x.json');
   writeFileSync(spec, JSON.stringify({ type: 'flowchart', title: 'Installed', nodes: [{ id: 'a', label: 'Start' }, { id: 'b', label: 'Done' }], edges: [['a', 'b']] }));
   const r = spawnSync(process.execPath, [join(installed, 'scripts/seecode.mjs'), 'render', spec], { cwd: proj, env, encoding: 'utf8' });

@@ -2,10 +2,11 @@
 // Deterministic dist/seecode.zip of skills/seecode/ for uploading to Claude.ai
 // (Settings → Capabilities → Skills). Same inputs → byte-identical zip:
 // sorted entries, fixed timestamps, fixed permissions, no extra fields.
-import { readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { deflateRawSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
+import { shippedFiles } from './shipped.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SRC = join(ROOT, 'skills/seecode');
@@ -20,20 +21,14 @@ function crc32(buf) {
   for (const b of buf) c = CRC[(c ^ b) & 0xff] ^ (c >>> 8);
   return (c ^ -1) >>> 0;
 }
-function walk(dir) {
-  return readdirSync(dir).sort().flatMap((f) => {
-    if (f === '.DS_Store' || f.startsWith('.tmp')) return [];
-    const p = join(dir, f);
-    return statSync(p).isDirectory() ? walk(p) : [p];
-  });
-}
 
 export function buildZip(out = join(ROOT, 'dist/seecode.zip')) {
   const locals = [];
   const centrals = [];
   let offset = 0;
   const DOS_TIME = 0, DOS_DATE = (1 << 5) | 1; // 1980-01-01 00:00
-  for (const file of walk(SRC)) {
+  // only shipped files: what git tracks (plus new, non-ignored files)
+  for (const file of shippedFiles('skills/seecode').map((p) => join(ROOT, p))) {
     const name = Buffer.from(`seecode/${relative(SRC, file).split('\\').join('/')}`);
     const data = readFileSync(file);
     const comp = deflateRawSync(data, { level: 9 });
