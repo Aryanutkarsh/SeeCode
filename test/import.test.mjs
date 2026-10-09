@@ -98,3 +98,22 @@ test('a malformed numeric entity cannot fail the import', () => {
   assert.equal(clean('&#xD800;y'), '�y');
   assert.equal(clean('&#0;z'), '�z');
 });
+
+test('draw.io: an edge label cell labels its edge instead of becoming a node', () => {
+  const m = parseDrawio(board([
+    cell('a', 'value="API" vertex="1" parent="1"'), cell('b', 'value="DB" vertex="1" parent="1"', 'x="300" y="0" width="80" height="40"'),
+    '<mxCell id="e" edge="1" source="a" target="b" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>',
+    '<mxCell id="l" value="calls" style="edgeLabel;" vertex="1" connectable="0" parent="e"><mxGeometry x="-0.2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry></mxCell>',
+  ]));
+  assert.deepEqual(m.nodes.map((n) => n.label), ['API', 'DB']);
+  assert.equal(m.edges[0].label, 'calls');
+});
+
+test('draw.io: relative geometry resolves against the parent, plus its offset', () => {
+  const m = parseDrawio(board([
+    cell('p', 'value="Server" vertex="1" parent="1"', 'x="600" y="400" width="100" height="40"'),
+    '<mxCell id="port" value="Port" vertex="1" parent="p"><mxGeometry x="1" y="0.5" width="10" height="10" relative="1" as="geometry"><mxPoint x="-5" y="-5" as="offset"/></mxGeometry></mxCell>',
+  ]));
+  const port = m.nodes.find((n) => n.label === 'Port');
+  assert.deepEqual([port.x, port.y], [695, 415]);
+});

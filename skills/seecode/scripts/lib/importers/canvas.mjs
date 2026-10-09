@@ -58,21 +58,23 @@ export function parseDrawio(xmlIn) {
   let xml = xmlIn;
   const dm = xml.match(/<diagram[^>]*>([\s\S]*?)<\/diagram>/);
   if (dm && !/<mxGraphModel/.test(dm[1])) xml = decodeDiagram(dm[1]);
-  const cells = [...xml.matchAll(/<mxCell\b([^>]*?)(?:\/>|>([\s\S]*?)<\/mxCell>)/g)].map((m) => {
-    const a = xmlAttrs(m[1]);
-    const g = m[2] && m[2].match(/<mxGeometry\b([^>]*)/);
+  // geometry: relative="1" means x/y are fractions of the parent's size
+  // (ports, edge labels), plus an optional <mxPoint as="offset"> in px
+  const geom = (inner) => {
+    const g = inner && inner.match(/<mxGeometry\b([^>]*?)(?:\/>|>([\s\S]*?)<\/mxGeometry>)/);
     const geo = g ? xmlAttrs(g[1]) : {};
-    return { ...a, x: num(geo.x), y: num(geo.y), w: num(geo.width), h: num(geo.height) };
-  });
+    const off = g && g[2] && g[2].match(/<mxPoint\b([^>]*\bas="offset"[^>]*)/);
+    const o = off ? xmlAttrs(off[1]) : {};
+    return { x: num(geo.x), y: num(geo.y), w: num(geo.width), h: num(geo.height), rel: geo.relative === '1', ox: num(o.x), oy: num(o.y) };
+  };
+  const cells = [...xml.matchAll(/<mxCell\b([^>]*?)(?:\/>|>([\s\S]*?)<\/mxCell>)/g)].map((m) => ({ ...xmlAttrs(m[1]), ...geom(m[2]) }));
   // also <UserObject label=...><mxCell .../></UserObject>
   for (const m of xml.matchAll(/<(?:UserObject|object)\b([^>]*)>\s*<mxCell\b([^>]*?)(?:\/>|>([\s\S]*?)<\/mxCell>)/g)) {
     const o = xmlAttrs(m[1]), c = xmlAttrs(m[2]);
-    const g = m[3] && m[3].match(/<mxGeometry\b([^>]*)/);
-    const geo = g ? xmlAttrs(g[1]) : {};
-    cells.push({ ...c, id: o.id, value: o.label, x: num(geo.x), y: num(geo.y), w: num(geo.width), h: num(geo.height) });
+    cells.push({ ...c, id: o.id, value: o.label, ...geom(m[3]) });
   }
   if (cells.length > MAX_CELLS) return { error: `draw.io page has ${cells.length} cells (limit ${MAX_CELLS})`, fix: 'export just the page or region you want drawn, then import that' };
-  const bad = cells.find((c) => c.vertex === '1' && [c.x, c.y, c.w, c.h].some(Number.isNaN));
+  const bad = cells.find((c) => c.vertex === '1' && [c.x, c.y, c.w, c.h, c.ox, c.oy].some(Number.isNaN));
   if (bad) return { error: `draw.io cell "${clean(bad.id, 24)}" has non-numeric or out-of-range geometry`, fix: 'fix or delete that shape in draw.io, then import again' };
   const seen = new Set();
   for (const c of cells) {
@@ -85,18 +87,24 @@ export function parseDrawio(xmlIn) {
   const containers = new Set(cells.filter((c) => c.vertex === '1' && /swimlane|group|container=1/.test(c.style || '')).map((c) => c.id));
   // child geometry is relative to its parent vertex; a cyclic parent chain
   // (only in hand-edited or hostile files) is cut at the first repeat
+  const local = (c) => {
+    const p = byId.get(c.parent);
+    return c.rel && p && p.vertex === '1' ? { x: c.x * p.w + c.ox, y: c.y * p.h + c.oy } : { x: c.x, y: c.y };
+  };
   const abs = (c) => {
-    let x = c.x, y = c.y, p = byId.get(c.parent);
+    let { x, y } = local(c), p = byId.get(c.parent);
     const chain = new Set([c.id]);
-    while (p && p.vertex === '1' && !chain.has(p.id)) { chain.add(p.id); x += p.x; y += p.y; p = byId.get(p.parent); }
+    while (p && p.vertex === '1' && !chain.has(p.id)) { chain.add(p.id); const l = local(p); x += l.x; y += l.y; p = byId.get(p.parent); }
     return { x, y };
   };
+  // a vertex whose parent is an edge is that edge's label, not a shape
+  const edgeIds = new Set(cells.filter((c) => c.edge === '1').map((c) => c.id));
   const groups = [...containers].map((id) => ({ id: safeId(`g_${id}`, map, used), src: id, label: clean(byId.get(id).value || 'Group', 32) }));
   const gmap = new Map(groups.map((g) => [g.src, g.id]));
   const nodes = [];
   const idOf = new Map();
   for (const c of cells) {
-    if (c.vertex !== '1' || containers.has(c.id)) continue;
+    if (c.vertex !== '1' || containers.has(c.id) || edgeIds.has(c.parent)) continue;
     const label = clean(c.value || '');
     if (!label && !/ellipse|rhombus/.test(c.style || '')) continue;
     const st = c.style || '';
