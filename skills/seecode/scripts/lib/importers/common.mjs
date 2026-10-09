@@ -1,13 +1,34 @@
 // Shared helpers for importers. Imported text is untrusted data: we only
 // ever copy it into labels (truncated, tags stripped), never interpret it.
 
-const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', '#39': "'" };
+// Named entities seen in diagram sources (draw.io labels, PlantUML, HTML in
+// Mermaid). Unknown names are left as written.
+const ENT = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ensp: ' ', emsp: ' ', thinsp: ' ',
+  mdash: '—', ndash: '–', hellip: '…', middot: '·', bull: '•', times: '×', divide: '÷', minus: '−', plusmn: '±',
+  rarr: '→', larr: '←', uarr: '↑', darr: '↓', harr: '↔', rArr: '⇒', lArr: '⇐', hArr: '⇔',
+  lsquo: '‘', rsquo: '’', sbquo: '‚', ldquo: '“', rdquo: '”', bdquo: '„', laquo: '«', raquo: '»', lsaquo: '‹', rsaquo: '›',
+  copy: '©', reg: '®', trade: '™', deg: '°', sect: '§', para: '¶', dagger: '†', Dagger: '‡', prime: '′', Prime: '″',
+  euro: '€', pound: '£', yen: '¥', cent: '¢', curren: '¤', permil: '‰', micro: 'µ', infin: '∞', ne: '≠', le: '≤', ge: '≥', asymp: '≈',
+  frac12: '½', frac14: '¼', frac34: '¾', sup2: '²', sup3: '³', check: '✓', cross: '✗', hearts: '♥', star: '☆',
+};
+// &#128;–&#159; mean windows-1252 characters in HTML, not C1 controls
+const CP1252 = { 128: '€', 130: '‚', 131: 'ƒ', 132: '„', 133: '…', 134: '†', 135: '‡', 136: 'ˆ', 137: '‰', 138: 'Š', 139: '‹', 140: 'Œ', 142: 'Ž', 145: '‘', 146: '’', 147: '“', 148: '”', 149: '•', 150: '–', 151: '—', 152: '˜', 153: '™', 154: 'š', 155: '›', 156: 'œ', 158: 'ž', 159: 'Ÿ' };
+
+// A numeric reference as HTML reads it: out-of-range values and lone
+// surrogates become U+FFFD instead of throwing.
+function numericRef(body) {
+  const n = body[1] === 'x' || body[1] === 'X' ? parseInt(body.slice(2), 16) : parseInt(body.slice(1), 10);
+  if (!Number.isFinite(n) || n === 0 || n > 0x10ffff || (n >= 0xd800 && n <= 0xdfff)) return '\uFFFD';
+  if (n >= 128 && n <= 159) return CP1252[n] || '\uFFFD';
+  return String.fromCodePoint(n);
+}
 
 export function clean(s, max = 40) {
   let t = String(s ?? '')
     .replace(/<br\s*\/?>/gi, ' ')
     .replace(/<[^>]*>/g, '')
-    .replace(/&(#?\w+);/g, (m, e) => ENT[e] ?? (e.startsWith('#') ? String.fromCodePoint(parseInt(e.slice(1).replace(/^x/, '0x'), e[1] === 'x' ? 16 : 10)) : m))
+    .replace(/&(#[xX][0-9a-fA-F]+|#\d+|\w+);/g, (m, e) => (e[0] === '#' ? numericRef(e) : ENT[e] ?? m))
     .replace(/\\n/g, ' ')
     .replace(/[\u0000-\u001f\u007f]/g, ' ')
     .replace(/\s+/g, ' ')

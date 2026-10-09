@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { importFile, detect } from '../skills/seecode/scripts/lib/importers/import.mjs';
 import { renderSpec } from '../skills/seecode/scripts/lib/render.mjs';
 import { parseDrawio, parseExcalidraw, MAX_CELLS } from '../skills/seecode/scripts/lib/importers/canvas.mjs';
+import { clean } from '../skills/seecode/scripts/lib/importers/common.mjs';
 
 const FIX = fileURLToPath(new URL('./fixtures/', import.meta.url));
 const out = mkdtempSync(join(tmpdir(), 'sc-import-'));
@@ -82,4 +83,18 @@ test('excalidraw: repeated element ids are rejected; containerId text still labe
   assert.match(parseExcalidraw({ elements: [rect('r', 0), rect('r', 200)] }).error, /repeats element id "r"/);
   const m = parseExcalidraw({ elements: [rect('r', 0), { id: 't', type: 'text', text: 'Hello', containerId: 'r', x: 0, y: 0, width: 40, height: 20 }] });
   assert.deepEqual(m.nodes.map((n) => n.label), ['Hello']);
+});
+
+test('imported labels decode HTML entities the way a browser would', () => {
+  assert.equal(clean('A &mdash; B &rarr; C &hellip;'), 'A — B → C …');
+  assert.equal(clean('Tom &amp; Jerry &copy; 2026'), 'Tom & Jerry © 2026');
+  assert.equal(clean('&#x2014;&#X41;&#65;&#39;'), '—AA\'');
+  assert.equal(clean('&#128;5'), '€5', '128–159 are windows-1252');
+  assert.equal(clean('&unknown; stays'), '&unknown; stays');
+});
+
+test('a malformed numeric entity cannot fail the import', () => {
+  assert.equal(clean('&#99999999;x'), '�x');
+  assert.equal(clean('&#xD800;y'), '�y');
+  assert.equal(clean('&#0;z'), '�z');
 });
