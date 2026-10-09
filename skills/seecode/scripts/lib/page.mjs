@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { el, esc } from './svg.mjs';
-import { FONTS_HREF, DIAGRAM_CSS, SKINS, skinCss } from './tokens.mjs';
+import { FONTS_HREF, DIAGRAM_CSS, SKINS, ON_FILL, skinCss } from './tokens.mjs';
 import { cleanFonts } from './config/config.mjs';
 import { watermarkOn, watermarkSvg, MARK, FAVICON } from './mark.mjs';
 import { MOTION_CSS, motionVars } from './motion.mjs';
@@ -49,7 +49,7 @@ export function buildPage({ spec, result, preset, typeName, settings = {} }) {
     result.body,
     mark ? watermarkSvg([vx, vy, vw, vh], slug) : '',
   ]);
-  const tokenNames = [...Object.keys(SKINS.light), 'font-serif', 'font-sans', 'font-mono'].map((k) => `--sc-${k}`).join(',');
+  const tokenNames = [...Object.keys(SKINS.light), ...ON_FILL.map((v) => `on-${v}`), 'font-serif', 'font-sans', 'font-mono'].map((k) => `--sc-${k}`).join(',');
   const bar = [
     interactive ? '<input class="sc-search" type="search" placeholder="Find node…" aria-label="Find node">' : '',
     '<span class="sc-spacer"></span>',

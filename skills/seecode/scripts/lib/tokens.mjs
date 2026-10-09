@@ -68,12 +68,33 @@ function applyBrand(base, roles) {
 
 // Brand: { accent, link, paper, ink, muted, dark?: {…} }. Dark mode uses the
 // brand's dark palette when it has one, else keeps just its accent family.
-export function skinCss({ skin = 'light', brand = {} } = {}) {
+// The resolved light and dark palettes for a skin + brand (terminal has one
+// palette, used for both). Renderers that pick colours by contrast use these.
+export function themePalettes({ skin = 'light', brand = {} } = {}) {
   const base = SKINS[skin] || SKINS.light;
-  const { dark: darkBrand, light: lightBrand, fonts, ...flat } = brand;
+  const { dark: darkBrand, light: lightBrand, fonts, ...flat } = brand || {};
+  const light = applyBrand(base, lightBrand || flat);
+  if (skin === 'terminal') return { light, dark: light };
+  const dark = darkBrand ? applyBrand(SKINS.dark, darkBrand) : applyBrand(SKINS.dark, flat.accent ? { accent: flat.accent, ...(flat.link ? { link: flat.link } : {}) } : {});
+  return { light, dark };
+}
+
+// Text on a filled cell (heatmap) can need light text in one theme and dark
+// text in the other. Class vLD picks per theme (L = light theme, D = dark):
+// 1 = white, 0 = black. Pure black/white keep >= 4.5:1 on any mid-tone fill,
+// where the paper and ink tokens top out near 4:1.
+export const ON_FILL = ['v00', 'v01', 'v10', 'v11'];
+export const ON_FILL_TEXT = { 0: '#000000', 1: '#ffffff' };
+function onFillVars(slot) {
+  return Object.fromEntries(ON_FILL.map((v) => [`on-${v}`, ON_FILL_TEXT[v[slot]]]));
+}
+
+export function skinCss({ skin = 'light', brand = {} } = {}) {
+  const { fonts } = brand || {};
   const type = fontStacks(fonts);
-  const light = { ...applyBrand(base, lightBrand || flat), ...type };
-  const dark = { ...(darkBrand ? applyBrand(SKINS.dark, darkBrand) : applyBrand(SKINS.dark, flat.accent ? { accent: flat.accent, ...(flat.link ? { link: flat.link } : {}) } : {})), ...type };
+  const pal = themePalettes({ skin, brand });
+  const light = { ...pal.light, ...onFillVars(1), ...type };
+  const dark = { ...pal.dark, ...onFillVars(2), ...type };
   if (skin === 'terminal') {
     return `:root{${vars(light)}}`;
   }
@@ -285,7 +306,7 @@ export const DIAGRAM_CSS = `
 .tm-val{fill:var(--sc-muted);font-family:${FONT.mono};font-size:9px}.tm-val.is-focal{fill:var(--sc-paper);fill-opacity:.85}
 .tm-sub-label{fill:var(--sc-muted);font-size:9.5px}
 .hm-cell.hm-pos{fill:var(--sc-accent)}.hm-cell.hm-neg{fill:var(--sc-series-4)}
-.hm-val{fill:var(--sc-ink);font-family:${FONT.mono};font-size:8.5px}.hm-val.on-dark{fill:var(--sc-paper)}
+.hm-val{fill:var(--sc-ink);font-family:${FONT.mono};font-size:8.5px}${ON_FILL.map((v) => `.hm-val.${v}{fill:var(--sc-on-${v})}`).join('')}
 .db-line{stroke:var(--sc-rule-solid);stroke-width:2.4}.db-line.is-focal{stroke:var(--sc-accent);stroke-opacity:.45}
 .db-a{fill:var(--sc-paper);stroke:var(--sc-muted);stroke-width:1.4}.db-b{fill:var(--sc-muted)}.db-b.is-focal{fill:var(--sc-accent)}
 .mk-seg{fill-opacity:.7;stroke:var(--sc-paper)}

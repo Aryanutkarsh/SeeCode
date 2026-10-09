@@ -3,6 +3,8 @@
 import { el, text } from '../../svg.mjs';
 import { textWidth } from '../../text.mjs';
 import { niceDomain, ticks, fmt } from './scale.mjs';
+import { mix, contrast } from '../../color.mjs';
+import { themePalettes, ON_FILL_TEXT } from '../../tokens.mjs';
 
 export const family = 'chart';
 
@@ -114,8 +116,19 @@ export function renderTreemap(spec) {
   return { body: out.join(''), viewBox: [-16, -16, W + 32, H + 32], steps: Math.min(12, cells.length), problems, graph: { nodes: cells.map((c, k) => ({ id: `c${k}`, label: c.label })), edges: [] } };
 }
 
-export function renderHeatmap(spec) {
+// Ink or paper text over a heatmap cell, whichever reads better once the cell
+// (fill at its opacity over paper) is composited, decided per theme.
+function onFillClass(fillRole, alpha, pal) {
+  const pick = (p) => {
+    const bg = mix(p.paper, p[fillRole], alpha);
+    return contrast(ON_FILL_TEXT[1], bg) > contrast(ON_FILL_TEXT[0], bg) ? '1' : '0';
+  };
+  return `v${pick(pal.light)}${pick(pal.dark)}`;
+}
+
+export function renderHeatmap(spec, { settings = {} } = {}) {
   const problems = [];
+  const pal = themePalettes({ skin: spec.skin || settings.skin, brand: settings.brand });
   const { rows, cols, values } = spec;
   if (values.length !== rows.length || values.some((r) => r.length !== cols.length)) return { problems: [{ code: 'E_SPEC', at: 'values', msg: `values must be ${rows.length}×${cols.length}`, fix: 'one row of numbers per row label' }] };
   const flat = values.flat().filter((v) => v != null);
@@ -123,6 +136,8 @@ export function renderHeatmap(spec) {
   const diverging = spec.scale === 'diverging' || (lo < 0 && hi > 0);
   const rowW = Math.max(...rows.map((r) => textWidth(r, { size: 10 }))) + 16;
   const cw = Math.max(28, Math.min(64, 560 / cols.length)), ch = Math.max(22, Math.min(34, 360 / rows.length));
+  const showValues = spec.labels !== false && cw >= 34;
+  if (spec.labels !== false && !showValues) problems.push({ code: 'W_HEATMAP_LABELS', at: 'cols', msg: `${cols.length} columns leave cells too narrow for values (shown on hover only)`, fix: 'use fewer columns, transpose rows and cols, or set "labels": false' });
   const out = [];
   cols.forEach((c, j) => out.push(text({ class: 'ax-text', x: rowW + j * cw + cw / 2, y: -8, 'text-anchor': 'middle' }, c)));
   rows.forEach((r, i) => {
@@ -139,8 +154,9 @@ export function renderHeatmap(spec) {
         t = (v - lo) / (hi - lo || 1);
         cls = 'hm-pos';
       }
-      parts.push(el('rect', { class: `hm-cell ${cls}`, x: rowW + j * cw + 1, y: i * ch + 1, width: cw - 2, height: ch - 2, rx: 2, 'fill-opacity': (0.06 + t * 0.88).toFixed(2), 'data-sc-tip': `${r} · ${cols[j]}: ${fmt(v, spec.unit || '')}` }));
-      if (spec.labels !== false && cw >= 34) parts.push(text({ class: `hm-val${t > 0.6 ? ' on-dark' : ''}`, x: rowW + j * cw + cw / 2, y: i * ch + ch / 2 + 3.5, 'text-anchor': 'middle' }, fmt(v, spec.unit || '')));
+      const alpha = Number((0.06 + t * 0.88).toFixed(2));
+      parts.push(el('rect', { class: `hm-cell ${cls}`, x: rowW + j * cw + 1, y: i * ch + 1, width: cw - 2, height: ch - 2, rx: 2, 'fill-opacity': alpha, 'data-sc-tip': `${r} · ${cols[j]}: ${fmt(v, spec.unit || '')}` }));
+      if (showValues) parts.push(text({ class: `hm-val ${onFillClass(cls === 'hm-neg' ? 'series-4' : 'accent', alpha, pal)}`, x: rowW + j * cw + cw / 2, y: i * ch + ch / 2 + 3.5, 'text-anchor': 'middle' }, fmt(v, spec.unit || '')));
     });
     out.push(el('g', { class: 'sc-fade', 'data-sc-step': st, style: `--step:${st}` }, parts));
   });

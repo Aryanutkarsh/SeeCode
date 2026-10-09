@@ -17,3 +17,5 @@ Intensity across two categorical axes, such as hour × day or service × region.
 ```
 
 **Motion:** `reveal`, row by row. Hovering a cell shows its value.
+
+**Values in cells:** shown when cells are wide enough (about 13 columns or fewer), in black or white, whichever reads better on that cell in each theme. With more columns you get `W_HEATMAP_LABELS` and values on hover only.
