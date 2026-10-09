@@ -54,16 +54,56 @@ export function textWidth(str, { size = 12, mono = false, tracking = 0, upper = 
 export const snap = (v, g = 4) => Math.round(v / g) * g;
 export const ceil4 = (v) => Math.ceil(v / 4) * 4;
 
-// Greedy word wrap to maxWidth; returns lines.
+// CJK line-breaking: a break may fall between any two wide characters, but
+// closing punctuation never starts a line and opening punctuation never ends one.
+const NO_START = new Set([...'、。，．：；！？）」』】〕〉》｝］〙〗’”…‥ー々ゝゞヽヾぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ']);
+const NO_END = new Set([...'（「『【〔〈《｛［〘〖‘“']);
+
+// Split into units that may not be broken inside: Latin words (with the
+// space before them) and single wide characters (glued to punctuation).
+function units(str) {
+  const out = [];
+  for (const m of String(str).matchAll(/(\s*)(\S+)/g)) {
+    const space = m[1].length > 0 && out.length > 0;
+    let word = '';
+    let first = true;
+    const flush = (glue) => {
+      if (!word) return;
+      out.push({ text: word, space: first ? space : false, glue });
+      word = '';
+      first = false;
+    };
+    for (const ch of m[2]) {
+      const cp = ch.codePointAt(0);
+      if (NO_START.has(ch) && (word || out.length)) {
+        if (word) word += ch;
+        else out[out.length - 1].text += ch;
+        continue;
+      }
+      if (isWide(cp) || NO_END.has(ch)) {
+        if (word && !NO_END.has([...word].pop())) flush();
+        word += ch;
+        if (!NO_END.has(ch)) flush();
+      } else {
+        if (word && isWide([...word].pop().codePointAt(0))) flush();
+        word += ch;
+      }
+    }
+    flush();
+  }
+  return out;
+}
+
+// Greedy wrap to maxWidth; returns lines. Breaks at spaces, and between CJK
+// characters, which have no spaces to break at.
 export function wrap(str, maxWidth, opts) {
-  const words = String(str).split(/\s+/).filter(Boolean);
   const lines = [];
   let cur = '';
-  for (const w of words) {
-    const next = cur ? `${cur} ${w}` : w;
+  for (const u of units(str)) {
+    const next = cur ? `${cur}${u.space ? ' ' : ''}${u.text}` : u.text;
     if (cur && textWidth(next, opts) > maxWidth) {
       lines.push(cur);
-      cur = w;
+      cur = u.text;
     } else cur = next;
   }
   if (cur) lines.push(cur);
