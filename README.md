@@ -48,7 +48,7 @@ the API writes to Postgres, charges Stripe and publishes an event to Kafka.
 
 Keep going in plain language: *"highlight the payment path"*, *"make it dark"*, *"export it for my slides"*. The first time you use it in a project, SeeCode asks once whether to use your global settings or create project-specific ones.
 
-## 44 diagram types
+## 45 diagram types
 
 Every type animates its own way (systems trace their flows, sequences play message by message, charts grow), and every type can also be fully static. Click any diagram for the full-size image. Charts take their numbers from a CSV or JSON file, so the data never has to pass through the model.
 
@@ -111,7 +111,7 @@ Every type animates its own way (systems trace their flows, sequences play messa
 <tr>
   <td align="center" width="33%"><a href="docs/screenshots/exploded.png"><img src="docs/screenshots/gifs/exploded.gif" alt="Exploded view, animated"></a><br><b>Exploded view</b><br><sub>Parts of one thing, isometric</sub></td>
   <td align="center" width="33%"><a href="docs/screenshots/isometric-plan.png"><img src="docs/screenshots/gifs/isometric-plan.gif" alt="Isometric plan, animated"></a><br><b>Isometric plan</b><br><sub>A floor or site from above</sub></td>
-  <td align="center" width="33%"></td>
+  <td align="center" width="33%"><a href="docs/screenshots/isometric.png"><img src="docs/screenshots/gifs/isometric.gif" alt="Isometric object, animated"></a><br><b>Isometric object</b><br><sub>Any object, from a description</sub></td>
 </tr>
 <tr>
   <td align="center" width="33%"><a href="docs/screenshots/bar.png"><img src="docs/screenshots/gifs/bar.gif" alt="Bar, animated"></a><br><b>Bar</b><br><sub>Compare amounts</sub></td>
@@ -134,7 +134,20 @@ Every type animates its own way (systems trace their flows, sequences play messa
 
 ### Isometric: compose anything
 
-Two types draw in isometric 3D: **exploded views** (the parts of one thing, lifted apart and labelled, assembling on load) and **isometric plans** (a floor or a site, built up phase by phase). There is no fixed library of drawings: every part is a solid you dress with items on its top and sides (screens, chips, keys, cards, windows, shelves), make hollow, round, ribbed, or cap with a dome or a roof. So the same few lines of spec draw a phone, a keyboard, a burger or a street. [How it works](skills/seecode/references/isometric.md)
+Three types draw in isometric 3D: **isometric objects** (anything, from a plain description: ask for *"an office chair"* and the agent lists its parts and SeeCode draws it), **exploded views** (the parts of one thing, lifted apart and labelled, assembling on load) and **isometric plans** (a floor or a site, built up phase by phase). There is no fixed library of drawings: every part is a solid or a beam you place in 3D and dress with items on its top and sides (screens, chips, keys, cards, windows, shelves), make hollow, round, ribbed, lay on its side, or cap with a dome or a roof. So the same few lines of spec draw a chair, a van, a phone, a burger or a street. [How it works](skills/seecode/references/isometric.md)
+
+```text
+Use SeeCode to draw an office chair in isometric, and label the parts.
+```
+
+<table>
+<tr>
+  <td align="center" width="25%"><a href="docs/screenshots/isometric.png"><img src="docs/screenshots/gifs/isometric.gif" alt="Isometric office chair, animated"></a><br><b>Office chair</b><br><sub>Star base, gas lift, cushion</sub></td>
+  <td align="center" width="25%"><a href="docs/screenshots/laptop.png"><img src="docs/screenshots/gifs/laptop.gif" alt="Isometric laptop, animated"></a><br><b>Laptop</b><br><sub>Keys, trackpad, display</sub></td>
+  <td align="center" width="25%"><a href="docs/screenshots/espresso-machine.png"><img src="docs/screenshots/gifs/espresso-machine.gif" alt="Isometric espresso machine, animated"></a><br><b>Espresso machine</b><br><sub>Group head, wand, cups</sub></td>
+  <td align="center" width="25%"><a href="docs/screenshots/delivery-van.png"><img src="docs/screenshots/gifs/delivery-van.gif" alt="Isometric delivery van, animated"></a><br><b>Delivery van</b><br><sub>Wheels on their side</sub></td>
+</tr>
+</table>
 
 <table>
 <tr>
@@ -376,7 +389,7 @@ SeeCode has no server, accounts or telemetry. Generated diagrams load their font
 
 ## Acknowledgements
 
-SeeCode learned a great deal from two excellent open-source projects: [diagram-design](https://github.com/cathrynlavery/diagram-design) by Cathryn Lavery, for its editorial approach to diagram types and its isometric projection, and [archify](https://github.com/tt-a1i/archify) by tt-a1i, for its explorable, animated viewer. Thank you to both.
+SeeCode learned a great deal from excellent open-source projects: [diagram-design](https://github.com/cathrynlavery/diagram-design) by Cathryn Lavery, for its editorial approach to diagram types and its isometric projection, and [archify](https://github.com/tt-a1i/archify) by tt-a1i, for its explorable, animated viewer. The isometric object type was also inspired by [iso-glow](https://isoglow.dev) by April Zhu ([@Aprilzz423](https://x.com/Aprilzz423)) and [iso-figure](https://github.com/MrBongoC/ai-iso-skill) by Tolga Cohce, which showed how far isometric figures built from simple parts can go. All of these are MIT licensed; SeeCode's code is its own. Thank you all.
 
 If SeeCode is useful to you, a ⭐ helps others find it.
 

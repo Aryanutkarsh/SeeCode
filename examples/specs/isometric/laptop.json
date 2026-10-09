@@ -1,0 +1,111 @@
+{
+    "type": "isometric",
+    "title": "Laptop",
+    "parts": [
+        {
+            "id": "base",
+            "label": "Keyboard deck",
+            "sub": "aluminium",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "w": 220,
+            "d": 150,
+            "h": 10,
+            "r": 8,
+            "items": [
+                {
+                    "box": [
+                        0.08,
+                        0.08,
+                        0.92,
+                        0.58
+                    ],
+                    "repeat": [
+                        13,
+                        5
+                    ],
+                    "fill": 0.78,
+                    "h": 2,
+                    "r": 1
+                },
+                {
+                    "box": [
+                        0.32,
+                        0.66,
+                        0.68,
+                        0.94
+                    ],
+                    "tone": "mid",
+                    "r": 3
+                }
+            ],
+            "side": [
+                {
+                    "face": "right",
+                    "shape": "panel",
+                    "repeat": [
+                        2,
+                        1
+                    ],
+                    "box": [
+                        0.2,
+                        0.3,
+                        0.45,
+                        0.7
+                    ],
+                    "tone": "dark",
+                    "fill": 0.6
+                }
+            ]
+        },
+        {
+            "id": "screen",
+            "label": "Display",
+            "sub": "14-inch",
+            "x": 0,
+            "y": -78,
+            "z": 10,
+            "w": 220,
+            "d": 6,
+            "h": 140,
+            "r": 4,
+            "side": [
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "box": [
+                        0.04,
+                        0.06,
+                        0.96,
+                        0.94
+                    ],
+                    "tone": "dark"
+                },
+                {
+                    "face": "left",
+                    "shape": "text",
+                    "box": [
+                        0.12,
+                        0.25,
+                        0.7,
+                        0.75
+                    ],
+                    "n": 5
+                }
+            ],
+            "focal": true
+        },
+        {
+            "id": "hinge",
+            "x": 0,
+            "y": -72,
+            "z": 6,
+            "w": 180,
+            "d": 8,
+            "h": 8,
+            "axis": "x",
+            "tone": "dark"
+        }
+    ]
+}

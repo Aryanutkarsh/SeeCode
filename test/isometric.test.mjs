@@ -196,3 +196,81 @@ test('dark panels keep a visible edge in dark themes only', () => {
   assert.match(css, /data-theme="dark"\]\{[^}]*--sc-ax-dark-edge:rgba\(255,255,255,0\.34\)/);
   assert.match(skinCss({ brand: { paper: '#111111', ink: '#eeeeee' } }), /:root\{[^}]*--sc-ax-dark-edge:rgba\(255,255,255,0\.34\)/);
 });
+
+// ---- isometric objects ------------------------------------------------------
+
+const stool = {
+  type: 'isometric', title: 'Stool',
+  parts: [
+    { id: 'seat', label: 'Seat', x: 0, y: 0, z: 60, w: 50, d: 50, h: 6, r: 'round', focal: true },
+    { from: [-15, -15, 0], to: [-12, -12, 60], thick: 4 }, { from: [15, -15, 0], to: [12, -12, 60], thick: 4 },
+    { from: [-15, 15, 0], to: [-12, 12, 60], thick: 4 }, { id: 'leg', label: 'Legs', from: [15, 15, 0], to: [12, 12, 60], thick: 4 },
+  ],
+};
+
+test('object: solids and beams render, named parts get callouts, the rest stay unlabelled', () => {
+  const r = renderSpec(stool);
+  assert.equal(r.ok, true, JSON.stringify(r.problems));
+  assert.deepEqual((r.result.problems || []).filter((p) => !p.code.startsWith('I_')), []);
+  const svg = svgOf(r);
+  assert.equal([...svg.matchAll(/class="iso-beam-o"/g)].length, 4);
+  assert.equal([...svg.matchAll(/data-role="name"/g)].length, 2);
+  assert.deepEqual(r.result.graph.nodes.map((n) => n.id), ['seat', 'leg']);
+  assert.match(svg, /data-sc-node="seat"/);
+});
+
+test('object: any units are scaled to the same drawing size', () => {
+  const big = renderSpec(stool);
+  const tiny = renderSpec({ ...stool, parts: stool.parts.map((p) => (p.from ? { ...p, from: p.from.map((v) => v / 3), to: p.to.map((v) => v / 3), thick: Math.max(1, p.thick / 3) } : { ...p, x: p.x / 3, y: p.y / 3, z: p.z / 3, w: p.w / 3, d: p.d / 3, h: p.h / 3 })) });
+  const width = (r) => r.result.viewBox[2];
+  assert.ok(Math.abs(width(big) - width(tiny)) / width(big) < 0.25, `${width(big)} vs ${width(tiny)}`);
+});
+
+test('object: parts paint back to front, so the seat covers the legs below it', () => {
+  const svg = svgOf(renderSpec(stool));
+  assert.ok(svg.indexOf('data-sc-node="seat"') > svg.indexOf('iso-beam-o'), 'legs (below) paint before the seat');
+});
+
+test('object: a label points at a visible spot of its part, not one hidden behind another', () => {
+  const r = renderSpec({ type: 'isometric', title: 'Hidden', parts: [
+    { id: 'post', label: 'Post', x: 0, y: 0, z: 0, w: 10, d: 10, h: 80, r: 'round' },
+    { id: 'top', label: 'Top', x: 0, y: 0, z: 60, w: 40, d: 40, h: 8 },
+  ] });
+  const svg = svgOf(r);
+  const group = [...svg.matchAll(/<g class="iso-label[^"]*"[^>]*>([\s\S]*?)<\/g>/g)].map((m) => m[1]).find((g) => />Post</.test(g));
+  const dot = /<circle class="iso-dot" cx="([\d.-]+)" cy="([\d.-]+)"/.exec(group);
+  assert.ok(dot, 'post has a label');
+  // the slab hides the post's middle; its label dot must sit below the slab
+  const slab = /data-sc-node="top"[\s\S]*?class="iso-sil" data-role="silhouette" d="([^"]+)"/.exec(svg)[1];
+  const pts = slab.match(/-?[\d.]+/g).map(Number);
+  const poly = pts.filter((_, i) => !(i % 2)).map((x, i) => ({ x, y: pts[2 * i + 1] }));
+  const [x, y] = [Number(dot[1]), Number(dot[2])];
+  let inside = true;
+  for (let i = 0; i < poly.length; i++) { const a = poly[i], b = poly[(i + 1) % poly.length]; if ((b.x - a.x) * (y - a.y) - (b.y - a.y) * (x - a.x) < -1e-6) inside = false; }
+  assert.equal(inside, false, `the label dot (${x}, ${y}) must not sit inside the slab's outline`);
+});
+
+test('object: round parts can lie along x or y (wheels, pipes)', () => {
+  const r = renderSpec({ type: 'isometric', title: 'Wheels', parts: [{ label: 'Body', x: 0, y: 0, z: 10, w: 60, d: 100, h: 30 }, { label: 'Wheel', x: 32, y: 30, z: 0, w: 10, d: 20, h: 20, axis: 'x', tone: 'dark' }] });
+  assert.equal(r.ok, true, JSON.stringify(r.problems));
+  assert.match(svgOf(r), /iso-solid it-solid it-dark/);
+  assert.doesNotMatch(svgOf(r), /NaN/);
+});
+
+test('object: a part without a size uses defaults in the spec\'s own units (they scale too)', () => {
+  // the box with no w/d/h must draw at the same size as an explicit 40 × 40 × 10
+  const implicit = renderSpec({ type: 'isometric', title: 'A', parts: [{ x: 0, y: 0, z: 0 }, { x: 200, y: 0, z: 0, w: 40, d: 40, h: 10 }] });
+  const sizes = [...svgOf(implicit).matchAll(/class="iso-sil" data-role="silhouette" d="([^"]+)"/g)].map((m) => {
+    const n = m[1].match(/-?[\d.]+/g).map(Number);
+    const xs = n.filter((_, i) => !(i % 2));
+    return Math.round(Math.max(...xs) - Math.min(...xs));
+  });
+  assert.equal(sizes[0], sizes[1], sizes.join(' vs '));
+});
+
+test('a hollow item draws what sits inside it', () => {
+  const r = renderSpec({ type: 'isometric', title: 'Cup', parts: [{ label: 'Saucer', w: 60, d: 60, h: 4, r: 'round', items: [{ at: [0.5, 0.5], size: [0.5, 0.5], h: 20, r: 'round', hollow: true, items: [{ box: [0.1, 0.1, 0.9, 0.9], r: 'round', tone: 'dark' }] }] }] });
+  const svg = svgOf(r);
+  const back = svg.indexOf('iso-hollow-back'), coffee = svg.indexOf('class="it-dark"', back), front = svg.indexOf('iso-hollow-front');
+  assert.ok(back > 0 && back < coffee && coffee < front, [back, coffee, front].join(','));
+});

@@ -1,6 +1,38 @@
 # Composing isometric parts and boxes
 
-Both isometric types (`exploded` parts, `isometric-plan` boxes) draw every solid the same way, and you dress it with a small grammar instead of picking from fixed drawings. Compose anything: a phone, a keyboard, a burger, a server rack, a building, a coffee machine.
+All three isometric types (`isometric` objects, `exploded` parts, `isometric-plan` boxes) draw every solid the same way, and you dress it with a small grammar instead of picking from fixed drawings. Compose anything: a phone, a keyboard, a burger, a server rack, a building, a coffee machine.
+
+## Drawing any object from a description (`isometric`)
+
+When someone asks for "an office chair" or "a coffee grinder", model it the way you would sketch it:
+
+1. **List the parts** a person would point at (5–25): the big masses first, then what makes it recognisable (legs, wheels, handles, screens, buttons).
+2. **Pick sizes in one unit** (cm or mm, whatever is natural). Proportions matter more than scale: SeeCode scales the drawing to fit.
+3. **Place each part**: a solid by its centre `x, y` and base `z` (z up, the floor at 0); a thin part (leg, arm, pole, cable) as a beam `from` → `to`. Let parts touch: a seat's `z` is the top of its gas lift.
+4. **Shape it**: `r:"round"` for discs and cylinders, `axis:"x"|"y"` for wheels and pipes, `top:"dome"` for cushions, buns and shades, `hollow` for cups and trays, `rings` for ribs.
+5. **Add detail on the visible faces**: the top (`items`) and the front-left (`left`, +y) and front-right (`right`, +x) walls (`side`): screens, keys, vents, windows, dials. `tone:"dark"` for rubber, glass and black plastic.
+6. **Label** the 3–7 parts that matter and mark one `focal`.
+
+Worked example: an office chair (a five-star base with casters, a gas lift, a cushioned seat, a mesh back, armrests):
+
+```json
+{"type":"isometric","title":"Office chair","parts":[
+ {"label":"Base","sub":"five-star","from":[0,0,14],"to":[68,22,10],"thick":8,"tone":"dark"},
+ {"from":[0,0,14],"to":[0,72,10],"thick":8,"tone":"dark"},
+ {"from":[0,0,14],"to":[-68,22,10],"thick":8,"tone":"dark"},
+ {"from":[0,0,14],"to":[-42,-58,10],"thick":8,"tone":"dark"},
+ {"from":[0,0,14],"to":[42,-58,10],"thick":8,"tone":"dark"},
+ {"label":"Casters","x":42,"y":-58,"z":0,"w":12,"d":12,"h":8,"r":"round","tone":"dark"},
+ {"label":"Gas lift","x":0,"y":0,"z":18,"w":12,"d":12,"h":70,"r":"round","tone":"dark"},
+ {"label":"Seat","x":0,"y":6,"z":96,"w":112,"d":110,"h":10,"r":20,"top":"dome","topH":7,"focal":true},
+ {"from":[0,-48,100],"to":[0,-52,140],"thick":10,"tone":"dark"},
+ {"label":"Backrest","x":0,"y":-56,"z":124,"w":104,"d":12,"h":112,"r":10,
+  "side":[{"face":"left","shape":"lines","box":[0.1,0.12,0.9,0.92],"n":9}]},
+ {"from":[54,-4,100],"to":[54,-4,138],"thick":7,"tone":"dark"},
+ {"label":"Armrests","x":54,"y":2,"z":138,"w":14,"d":62,"h":6,"r":5}]}
+```
+
+(Add the other casters and the left armrest the same way.)
 
 ## The solid
 
@@ -50,3 +82,7 @@ Shorthands written in the same grammar. Your own `items` and `side` are added on
 - Two or three levels of detail read best: the solid, panels or insets on its top, then small pieces. More turns to noise at this size.
 - Use `dark` for screens and chips, `accent` only on the focal part's detail, and `mid`, `cut` or `ring` for subtle detail.
 - Units are px-like. A phone is roughly 150×300, a desk 60×30, a building 120×90 with height 40–60.
+
+## Credits
+
+The isometric types draw on ideas from [diagram-design](https://github.com/cathrynlavery/diagram-design) by Cathryn Lavery (exploded axonometric and axonometric plan), [iso-glow](https://isoglow.dev) by April Zhu, and [iso-figure](https://github.com/MrBongoC/ai-iso-skill) by Tolga Cohce (isometric figures built from parts, detail drawn on face planes). All MIT licensed; SeeCode's code is its own.

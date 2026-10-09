@@ -1,5 +1,5 @@
 {
-  "title": "Exploded view",
+  "title": "Isometric object",
   "required": [
     "parts"
   ],
@@ -7,19 +7,15 @@
   "properties": {
     "parts": {
       "type": "array",
-      "minItems": 2,
-      "maxItems": 8,
+      "minItems": 1,
+      "maxItems": 60,
       "items": {
         "anyOf": [
           {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 28
-          },
-          {
             "type": "object",
             "required": [
-              "label"
+              "from",
+              "to"
             ],
             "additionalProperties": false,
             "properties": {
@@ -29,27 +25,94 @@
               },
               "label": {
                 "type": "string",
-                "minLength": 1,
                 "maxLength": 28
               },
               "sub": {
                 "type": "string",
                 "maxLength": 36
               },
+              "from": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number",
+                  "minimum": -4000,
+                  "maximum": 4000
+                }
+              },
+              "to": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number",
+                  "minimum": -4000,
+                  "maximum": 4000
+                }
+              },
+              "thick": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 80
+              },
+              "tone": {
+                "enum": [
+                  "light",
+                  "dark",
+                  "accent"
+                ]
+              },
+              "focal": {
+                "type": "boolean"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_.-]*$"
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 28
+              },
+              "sub": {
+                "type": "string",
+                "maxLength": 36
+              },
+              "x": {
+                "type": "number",
+                "minimum": -4000,
+                "maximum": 4000
+              },
+              "y": {
+                "type": "number",
+                "minimum": -4000,
+                "maximum": 4000
+              },
+              "z": {
+                "type": "number",
+                "minimum": -4000,
+                "maximum": 4000
+              },
               "w": {
                 "type": "number",
-                "minimum": 24,
-                "maximum": 800
+                "minimum": 1,
+                "maximum": 2000
               },
               "d": {
                 "type": "number",
-                "minimum": 24,
-                "maximum": 800
+                "minimum": 1,
+                "maximum": 2000
               },
-              "t": {
+              "h": {
                 "type": "number",
-                "minimum": 2,
-                "maximum": 120
+                "minimum": 0.5,
+                "maximum": 2000
               },
               "r": {
                 "anyOf": [
@@ -65,21 +128,6 @@
                     ]
                   }
                 ]
-              },
-              "x": {
-                "type": "number",
-                "minimum": -800,
-                "maximum": 800
-              },
-              "y": {
-                "type": "number",
-                "minimum": -800,
-                "maximum": 800
-              },
-              "level": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 20
               },
               "focal": {
                 "type": "boolean"
@@ -155,26 +203,34 @@
                 "type": "number",
                 "minimum": 1,
                 "maximum": 400
+              },
+              "tone": {
+                "enum": [
+                  "light",
+                  "dark",
+                  "black",
+                  "accent"
+                ]
+              },
+              "axis": {
+                "enum": [
+                  "x",
+                  "y",
+                  "z"
+                ]
               }
             }
           }
         ]
       }
     },
-    "w": {
-      "type": "number",
-      "minimum": 24,
-      "maximum": 800
+    "labels": {
+      "type": "boolean"
     },
-    "d": {
+    "scale": {
       "type": "number",
-      "minimum": 24,
-      "maximum": 800
-    },
-    "gap": {
-      "type": "number",
-      "minimum": 8,
-      "maximum": 600
+      "minimum": 0.1,
+      "maximum": 10
     }
   },
   "$defs": {

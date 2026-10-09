@@ -2,6 +2,7 @@
 import { expandRoles, rgba } from './color.mjs';
 import { AXON_CSS } from './render/structure/axon.mjs';
 import { DETAIL_CSS } from './render/structure/iso-detail.mjs';
+import { OBJECT_CSS } from './render/structure/object.mjs';
 // Every renderer emits class names only; colors live here as CSS custom
 // properties so the light/dark toggle and skins never touch SVG markup.
 
@@ -326,4 +327,4 @@ export const DIAGRAM_CSS = `
 .wm-ghost{fill:none;stroke:var(--sc-accent);stroke-dasharray:2 2}
 .wm-inertia{stroke:var(--sc-ink);stroke-width:3}
 .callout{fill:var(--sc-muted);font-family:${FONT.serif};font-style:italic;font-size:13px}
-${AXON_CSS}${DETAIL_CSS}`;
+${AXON_CSS}${DETAIL_CSS}${OBJECT_CSS}`;

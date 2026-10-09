@@ -1,0 +1,187 @@
+{
+    "type": "isometric",
+    "title": "Espresso machine",
+    "parts": [
+        {
+            "id": "body",
+            "label": "Boiler housing",
+            "sub": "stainless",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "w": 120,
+            "d": 110,
+            "h": 130,
+            "r": 8,
+            "side": [
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "box": [
+                        0.15,
+                        0.62,
+                        0.85,
+                        0.9
+                    ],
+                    "tone": "dark"
+                },
+                {
+                    "face": "left",
+                    "shape": "text",
+                    "box": [
+                        0.22,
+                        0.7,
+                        0.6,
+                        0.84
+                    ],
+                    "n": 2,
+                    "tone": "light"
+                },
+                {
+                    "face": "right",
+                    "shape": "lines",
+                    "box": [
+                        0.1,
+                        0.1,
+                        0.9,
+                        0.5
+                    ],
+                    "n": 6
+                }
+            ]
+        },
+        {
+            "id": "tray",
+            "label": "Drip tray",
+            "x": 0,
+            "y": 70,
+            "z": 0,
+            "w": 110,
+            "d": 36,
+            "h": 8,
+            "r": 4,
+            "items": [
+                {
+                    "shape": "lines",
+                    "box": [
+                        0.08,
+                        0.2,
+                        0.92,
+                        0.8
+                    ],
+                    "n": 6,
+                    "dir": "v"
+                }
+            ]
+        },
+        {
+            "id": "group",
+            "label": "Group head",
+            "x": 0,
+            "y": 66,
+            "z": 72,
+            "w": 40,
+            "d": 40,
+            "h": 14,
+            "r": "round",
+            "tone": "dark"
+        },
+        {
+            "id": "handle",
+            "from": [
+                0,
+                70,
+                76
+            ],
+            "to": [
+                0,
+                118,
+                70
+            ],
+            "thick": 8,
+            "tone": "dark"
+        },
+        {
+            "id": "cup",
+            "label": "Cup",
+            "x": 0,
+            "y": 70,
+            "z": 8,
+            "w": 30,
+            "d": 30,
+            "h": 26,
+            "r": "round",
+            "hollow": true,
+            "focal": true
+        },
+        {
+            "id": "wand",
+            "label": "Steam wand",
+            "from": [
+                58,
+                40,
+                110
+            ],
+            "to": [
+                70,
+                86,
+                40
+            ],
+            "thick": 4
+        },
+        {
+            "id": "gauge",
+            "x": 40,
+            "y": 0,
+            "z": 130,
+            "w": 30,
+            "d": 30,
+            "h": 4,
+            "r": "round",
+            "items": [
+                {
+                    "shape": "ring",
+                    "box": [
+                        0.1,
+                        0.1,
+                        0.9,
+                        0.9
+                    ],
+                    "r": "round"
+                },
+                {
+                    "at": [
+                        0.62,
+                        0.4
+                    ],
+                    "size": [
+                        0.08,
+                        0.3
+                    ],
+                    "tone": "accent"
+                }
+            ]
+        },
+        {
+            "id": "cups",
+            "x": -30,
+            "y": -20,
+            "z": 130,
+            "w": 40,
+            "d": 40,
+            "h": 2,
+            "items": [
+                {
+                    "repeat": [
+                        2,
+                        2
+                    ],
+                    "h": 12,
+                    "r": "round",
+                    "fill": 0.7,
+                    "hollow": true
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,146 @@
+{
+    "type": "isometric",
+    "title": "Delivery van",
+    "parts": [
+        {
+            "id": "cargo",
+            "label": "Cargo box",
+            "sub": "10 m³",
+            "x": 0,
+            "y": -30,
+            "z": 16,
+            "w": 110,
+            "d": 170,
+            "h": 110,
+            "r": 4,
+            "side": [
+                {
+                    "face": "right",
+                    "shape": "panel",
+                    "box": [
+                        0.08,
+                        0.1,
+                        0.92,
+                        0.95
+                    ],
+                    "tone": "mid"
+                },
+                {
+                    "face": "right",
+                    "shape": "lines",
+                    "box": [
+                        0.5,
+                        0.1,
+                        0.52,
+                        0.95
+                    ],
+                    "n": 1,
+                    "dir": "v"
+                }
+            ]
+        },
+        {
+            "id": "cab",
+            "label": "Cab",
+            "x": 0,
+            "y": 82,
+            "z": 16,
+            "w": 110,
+            "d": 56,
+            "h": 80,
+            "r": 8,
+            "side": [
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "box": [
+                        0.12,
+                        0.5,
+                        0.88,
+                        0.92
+                    ],
+                    "tone": "dark"
+                },
+                {
+                    "face": "right",
+                    "shape": "panel",
+                    "box": [
+                        0.15,
+                        0.5,
+                        0.75,
+                        0.9
+                    ],
+                    "tone": "dark"
+                },
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "box": [
+                        0.08,
+                        0.12,
+                        0.25,
+                        0.28
+                    ],
+                    "tone": "accent"
+                },
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "box": [
+                        0.75,
+                        0.12,
+                        0.92,
+                        0.28
+                    ],
+                    "tone": "accent"
+                }
+            ],
+            "focal": true
+        },
+        {
+            "id": "w1",
+            "label": "Wheels",
+            "x": 52,
+            "y": -80,
+            "z": 0,
+            "w": 16,
+            "d": 32,
+            "h": 32,
+            "axis": "x",
+            "tone": "dark"
+        },
+        {
+            "id": "w2",
+            "x": 52,
+            "y": 80,
+            "z": 0,
+            "w": 16,
+            "d": 32,
+            "h": 32,
+            "axis": "x",
+            "tone": "dark"
+        },
+        {
+            "id": "w3",
+            "x": -52,
+            "y": -80,
+            "z": 0,
+            "w": 16,
+            "d": 32,
+            "h": 32,
+            "axis": "x",
+            "tone": "dark"
+        },
+        {
+            "id": "w4",
+            "x": -52,
+            "y": 80,
+            "z": 0,
+            "w": 16,
+            "d": 32,
+            "h": 32,
+            "axis": "x",
+            "tone": "dark"
+        }
+    ]
+}

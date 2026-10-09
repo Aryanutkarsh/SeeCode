@@ -462,6 +462,18 @@
           "type": "number",
           "minimum": 1,
           "maximum": 400
+        },
+        "hollow": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number",
+              "minimum": 0.5,
+              "maximum": 200
+            }
+          ]
         }
       }
     },

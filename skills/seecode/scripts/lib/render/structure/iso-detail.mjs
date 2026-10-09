@@ -88,6 +88,12 @@ export function drawItems(R, z, items = []) {
       out.push(drawItems(r, capSurface(r, z0 + it.h, th, it.top), it.items));
       continue;
     }
+    if (it.hollow) {
+      const wall = typeof it.hollow === 'number' ? it.hollow : Math.max(1.5, Math.min(W(r), D(r)) * 0.08);
+      // what sits inside (coffee in a cup) paints between the back and the front
+      out.push(hollowBack(r, z0, it.h, wall), drawItems(inset(r, wall), z0 + Math.min(2, it.h / 4), it.items), hollowFront(r, z0, it.h, wall, []));
+      continue;
+    }
     out.push(prism(r, z0, it.h, { cls }).svg);
     if (it.rings) out.push(rings(r, z0, it.h));
     out.push(drawItems(r, z0 + it.h, it.items));

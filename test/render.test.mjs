@@ -79,3 +79,17 @@ test('two nodes in one cell is an error', () => {
   assert.equal(r.ok, false);
   assert.equal(r.problems[0].code, 'E_CELL_TAKEN');
 });
+
+test('every JSON example in the type guides renders without errors or warnings', () => {
+  for (const f of readdirSync(join(ROOT, 'references/types')).filter((x) => x.endsWith('.md'))) {
+    const md = readFileSync(join(ROOT, 'references/types', f), 'utf8');
+    for (const m of md.matchAll(/```json\n([\s\S]*?)```/g)) {
+      const spec = JSON.parse(m[1]);
+      if (!spec.type) continue;
+      const r = renderSpec(spec);
+      assert.equal(r.ok, true, `${f}: ${JSON.stringify(r.problems)}`);
+      const bad = (r.result.problems || []).filter((p) => p.code.startsWith('E_'));
+      assert.deepEqual(bad, [], f);
+    }
+  }
+});

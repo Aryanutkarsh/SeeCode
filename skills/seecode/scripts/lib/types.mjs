@@ -25,6 +25,7 @@ import * as quadrant from './render/structure/quadrant.mjs';
 import * as matrix from './render/structure/matrix.mjs';
 import * as exploded from './render/structure/exploded.mjs';
 import * as plan from './render/structure/plan.mjs';
+import * as object from './render/structure/object.mjs';
 
 // schema defaults to the type slug (schemas/<slug>.schema.json)
 const ch = (name, renderer, extra = {}) => ({ name, family: 'chart', renderer, ...extra });
@@ -59,6 +60,7 @@ export const TYPES = {
   layers: st('Layer stack', layers),
   exploded: st('Exploded view', exploded),
   'isometric-plan': st('Isometric plan', plan),
+  isometric: st('Isometric object', object),
   venn: st('Venn', venn),
   pyramid: st('Pyramid', pyramid),
   fishbone: st('Fishbone', fishbone, { defaultMotion: 'trace' }),

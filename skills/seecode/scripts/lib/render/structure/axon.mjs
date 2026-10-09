@@ -130,7 +130,7 @@ export const AXON_CSS = `
 // A convex solid given as 3D faces (each a list of {x, y, z}, any winding).
 // Faces turned toward the viewer (+x +y +z) are drawn, each shaded by the
 // way it faces: mostly up = top tone, mostly +y = lit side, mostly +x = shade.
-function solidFaces(faces, cls = '') {
+export function solidFaces(faces, cls = '') {
   const all = faces.flat();
   const c = { x: all.reduce((s, p) => s + p.x, 0) / all.length, y: all.reduce((s, p) => s + p.y, 0) / all.length, z: all.reduce((s, p) => s + p.z, 0) / all.length };
   const out = [];
@@ -192,8 +192,11 @@ export function capFaces(rect, z, h, shape) {
         const a = rings[k][i], b = rings[k][(i + 1) % N];
         const ex = b.x - a.x, ey = b.y - a.y, el2 = Math.hypot(ex, ey) || 1;
         const ox = ey / el2, oy = -ex / el2; // outward in plan (counter-clockwise outline)
-        const th = ((k + 0.5) / n) * (Math.PI / 2);
-        const nx = ox * Math.cos(th), ny = oy * Math.cos(th), nz = Math.sin(th);
+        // the band's real slope: rise dz over inset dm (a shallow pillow is nearly flat)
+        const t0 = (k / n) * (Math.PI / 2), t1 = ((k + 1) / n) * (Math.PI / 2);
+        const dm = R * (Math.cos(t0) - Math.cos(t1)), dz = h * (Math.sin(t1) - Math.sin(t0));
+        const sl = Math.hypot(dm, dz) || 1;
+        const nx = (ox * dz) / sl, ny = (oy * dz) / sl, nz = dm / sl;
         if (nx + ny + nz <= 1e-6) return null; // faces away
         const lum = 0.1 * nx + 0.55 * ny + 0.83 * nz;
         return lum > 0.78 ? 't' : lum > 0.36 ? 'l' : 'r';
@@ -298,4 +301,20 @@ export function capHeight(rect, h, shape) {
     if (shape === 'shed') return h * (1 - (y - y0) / d);
     return 0;
   };
+}
+
+// A cylinder lying along x or y (a wheel, a pipe, a roll, a barrel): centre
+// (cx, cy, cz), radius rad, length len. Its two end discs and side are drawn
+// as a shaded solid.
+export function lyingCylinder(axis, cx, cy, cz, rad, len, cls = '') {
+  const N = 28;
+  const disc = (t) => Array.from({ length: N }, (_, i) => {
+    const a = (i / N) * Math.PI * 2;
+    const u = rad * Math.cos(a), v = rad * Math.sin(a);
+    return axis === 'x' ? { x: cx + t, y: cy + u, z: cz + v } : { x: cx + u, y: cy + t, z: cz + v };
+  });
+  const a = disc(-len / 2), b = disc(len / 2);
+  const faces = [a, b];
+  for (let i = 0; i < N; i++) { const j = (i + 1) % N; faces.push([a[i], a[j], b[j], b[i]]); }
+  return solidFaces(faces, cls);
 }

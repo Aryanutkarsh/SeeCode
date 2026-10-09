@@ -1,0 +1,293 @@
+{
+    "type": "isometric",
+    "title": "Office chair",
+    "subtitle": "What holds you up all day",
+    "parts": [
+        {
+            "id": "leg0",
+            "from": [
+                0,
+                0,
+                14
+            ],
+            "to": [
+                0.0,
+                72.0,
+                10
+            ],
+            "thick": 8,
+            "tone": "dark"
+        },
+        {
+            "id": "caster0",
+            "x": 0.0,
+            "y": 72.0,
+            "z": 0,
+            "w": 12,
+            "d": 12,
+            "h": 8,
+            "r": "round",
+            "tone": "dark"
+        },
+        {
+            "id": "leg1",
+            "from": [
+                0,
+                0,
+                14
+            ],
+            "to": [
+                -68.5,
+                22.2,
+                10
+            ],
+            "thick": 8,
+            "tone": "dark"
+        },
+        {
+            "id": "caster1",
+            "x": -68.5,
+            "y": 22.2,
+            "z": 0,
+            "w": 12,
+            "d": 12,
+            "h": 8,
+            "r": "round",
+            "tone": "dark"
+        },
+        {
+            "id": "leg2",
+            "from": [
+                0,
+                0,
+                14
+            ],
+            "to": [
+                -42.3,
+                -58.2,
+                10
+            ],
+            "thick": 8,
+            "tone": "dark"
+        },
+        {
+            "id": "caster2",
+            "x": -42.3,
+            "y": -58.2,
+            "z": 0,
+            "w": 12,
+            "d": 12,
+            "h": 8,
+            "r": "round",
+            "tone": "dark"
+        },
+        {
+            "id": "leg3",
+            "from": [
+                0,
+                0,
+                14
+            ],
+            "to": [
+                42.3,
+                -58.2,
+                10
+            ],
+            "thick": 8,
+            "tone": "dark"
+        },
+        {
+            "id": "caster3",
+            "x": 42.3,
+            "y": -58.2,
+            "z": 0,
+            "w": 12,
+            "d": 12,
+            "h": 8,
+            "r": "round",
+            "tone": "dark",
+            "label": "Casters"
+        },
+        {
+            "id": "leg4",
+            "from": [
+                0,
+                0,
+                14
+            ],
+            "to": [
+                68.5,
+                22.2,
+                10
+            ],
+            "thick": 8,
+            "tone": "dark",
+            "label": "Base",
+            "sub": "five-star, nylon"
+        },
+        {
+            "id": "caster4",
+            "x": 68.5,
+            "y": 22.2,
+            "z": 0,
+            "w": 12,
+            "d": 12,
+            "h": 8,
+            "r": "round",
+            "tone": "dark"
+        },
+        {
+            "id": "hub",
+            "x": 0,
+            "y": 0,
+            "z": 8,
+            "w": 20,
+            "d": 20,
+            "h": 10,
+            "r": "round",
+            "tone": "dark"
+        },
+        {
+            "id": "gas",
+            "label": "Gas lift",
+            "sub": "height adjust",
+            "x": 0,
+            "y": 0,
+            "z": 18,
+            "w": 12,
+            "d": 12,
+            "h": 70,
+            "r": "round",
+            "tone": "dark"
+        },
+        {
+            "id": "mech",
+            "x": 0,
+            "y": 0,
+            "z": 88,
+            "w": 50,
+            "d": 42,
+            "h": 8,
+            "r": 3,
+            "tone": "dark"
+        },
+        {
+            "id": "seat",
+            "label": "Seat",
+            "sub": "moulded foam",
+            "x": 0,
+            "y": 6,
+            "z": 96,
+            "w": 112,
+            "d": 110,
+            "h": 10,
+            "r": 20,
+            "top": "dome",
+            "topH": 7,
+            "focal": true
+        },
+        {
+            "id": "spine",
+            "from": [
+                0,
+                -48,
+                100
+            ],
+            "to": [
+                0,
+                -52,
+                140
+            ],
+            "thick": 10,
+            "tone": "dark"
+        },
+        {
+            "id": "back",
+            "label": "Backrest",
+            "sub": "mesh, lumbar",
+            "x": 0,
+            "y": -56,
+            "z": 124,
+            "w": 104,
+            "d": 12,
+            "h": 112,
+            "r": 10,
+            "side": [
+                {
+                    "face": "left",
+                    "shape": "lines",
+                    "box": [
+                        0.1,
+                        0.12,
+                        0.9,
+                        0.92
+                    ],
+                    "n": 9
+                },
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "box": [
+                        0.25,
+                        0.18,
+                        0.75,
+                        0.34
+                    ],
+                    "tone": "mid"
+                }
+            ]
+        },
+        {
+            "id": "armL",
+            "from": [
+                -54,
+                -4,
+                100
+            ],
+            "to": [
+                -54,
+                -4,
+                138
+            ],
+            "thick": 7,
+            "tone": "dark"
+        },
+        {
+            "id": "armR",
+            "from": [
+                54,
+                -4,
+                100
+            ],
+            "to": [
+                54,
+                -4,
+                138
+            ],
+            "thick": 7,
+            "tone": "dark"
+        },
+        {
+            "id": "padL",
+            "x": -54,
+            "y": 2,
+            "z": 138,
+            "w": 14,
+            "d": 62,
+            "h": 6,
+            "r": 5
+        },
+        {
+            "id": "padR",
+            "label": "Armrests",
+            "sub": "4d adjustable",
+            "x": 54,
+            "y": 2,
+            "z": 138,
+            "w": 14,
+            "d": 62,
+            "h": 6,
+            "r": 5
+        }
+    ]
+}
