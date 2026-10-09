@@ -8,6 +8,7 @@
 - `skin`: `light` | `dark` | `terminal`. The page has its own light/dark toggle.
 - `size`: `auto` | `wide` | `slide` | `square`.
 - `budget`: `strict` | `balanced` (default) | `faithful` (imports, up to 24 nodes) | `off`.
+- `lang`: the language of the labels (`"zh-CN"`, `"ja"`, `"ar"`…), default `en`. Sets the page language for screen readers and font shaping; right-to-left languages flip the page controls (the diagram keeps its layout). Chinese, Japanese and Korean labels wrap between characters.
 - `legend`: `false` hides it, `true` forces it. Rename or hide entries, and retitle it, with an object: `{"title":"Key","entries":{"backend":{"label":"Holiday"},"async":{"label":"Reminder"},"store":{"visible":false}}}`. Keys are node kinds, edge kinds, statuses, changes or series names; an unknown key gives `W_LEGEND_KEY` listing the valid ones. The viewer's Lens menu and detail panel use the same names.
 - `evidence`: `[{id,file,line?,note?}]`.
 

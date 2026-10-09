@@ -81,7 +81,7 @@ export function renderSpec(input, { specPath, settings = {} } = {}) {
     return { ok: false, problems: [{ code: 'E_TYPE', at: 'type', msg: `unknown type "${spec.type}"`, fix: `use one of: ${[...Object.keys(TYPES), ...Object.keys(ALIASES).filter((k) => TYPES[ALIASES[k][0]])].join(', ')}` }] };
   }
   const schemaProblems = validate(loadSchema(info.schema || spec.type), spec).map((p) => ({
-    code: 'E_SPEC', at: p.at, msg: p.msg, fix: FIX_HINTS[p.msg] || (p.msg.startsWith('must be one of') ? 'pick an allowed value' : 'fix the value'),
+    code: 'E_SPEC', at: p.at, msg: p.msg, fix: FIX_HINTS[p.msg] || (p.at === 'lang' ? 'use a language tag such as "en", "zh-CN", "ja" or "ar"' : p.msg.startsWith('must be one of') ? 'pick an allowed value' : 'fix the value'),
   }));
   if (schemaProblems.length) return { ok: false, problems: dedupe(schemaProblems) };
   let resolved = spec;

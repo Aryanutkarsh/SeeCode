@@ -12,9 +12,16 @@ import { VIEWER_CSS } from './viewer/viewer.css.mjs';
 const CLIENT = readFileSync(fileURLToPath(new URL('./viewer/viewer.client.js', import.meta.url)), 'utf8');
 const SIZE_MAX = { auto: 1200, wide: 1400, slide: 1280, square: 900 };
 
+// Keeps letters and digits in any script, so a Chinese or Arabic title
+// still gives a meaningful id and download name (not just "diagram").
 export function slugify(s) {
-  return String(s || 'diagram').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'diagram';
+  const slug = [...String(s || 'diagram').normalize('NFC').toLowerCase().replace(/[^\p{L}\p{N}\p{M}]+/gu, '-').replace(/^-|-$/g, '')].slice(0, 48).join('').replace(/-$/, '');
+  return slug || 'diagram';
 }
+
+// Right-to-left scripts flip the page chrome; the diagram keeps its geometry.
+const RTL = new Set(['ar', 'he', 'fa', 'ur', 'ps', 'yi', 'dv', 'ckb', 'sd', 'ug']);
+export const isRtl = (lang) => RTL.has(String(lang || '').split('-')[0].toLowerCase());
 
 export function buildPage({ spec, result, preset, typeName, settings = {} }) {
   const sketchy = (spec.style || settings.style) === 'sketchy';
@@ -34,6 +41,7 @@ export function buildPage({ spec, result, preset, typeName, settings = {} }) {
     viewBox: `${vx} ${vy} ${vw} ${vh}`,
     role: 'img',
     'aria-labelledby': `${slug}-title ${slug}-desc`,
+    lang: spec.lang || undefined, // kept by SVG exports, which leave the page behind
     'data-sc-type': spec.type,
     'data-sc-motion': motionAttr,
     'data-sc-slug': slug,
@@ -75,7 +83,7 @@ export function buildPage({ spec, result, preset, typeName, settings = {} }) {
   if (brand.fonts) brand.fonts = cleanFonts(brand.fonts);
   const brandFonts = brand.fonts || {};
   return `<!doctype html>
-<html lang="en">
+<html lang="${esc(spec.lang || 'en')}"${isRtl(spec.lang) ? ' dir="rtl"' : ''}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

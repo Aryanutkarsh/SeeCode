@@ -30,3 +30,16 @@ test('a long Chinese node label wraps inside the 220px node cap', () => {
   const w = Number(/data-sc-node="a"[\s\S]*?<rect[^>]*width="([\d.]+)"/.exec(r.html)[1]);
   assert.ok(w <= 220, `node is ${w}px wide`);
 });
+
+test('lang sets the page language, right-to-left direction and the svg lang', () => {
+  const spec = (lang, title) => ({ type: 'architecture', title, ...(lang ? { lang } : {}), nodes: [{ id: 'a', label: 'A', row: 0, col: 0 }, { id: 'b', label: 'B', row: 0, col: 1 }], edges: [['a', 'b']] });
+  const zh = renderSpec(spec('zh-CN', '每月的钱去哪了'));
+  assert.match(zh.html, /<html lang="zh-CN">/);
+  assert.match(zh.html, /<svg class="sc-svg[^>]* lang="zh-CN"/);
+  assert.match(zh.html, /data-sc-slug="每月的钱去哪了"/, 'non-Latin titles keep a meaningful slug');
+  assert.match(renderSpec(spec('ar', 'كيف تعمل')).html, /<html lang="ar" dir="rtl">/);
+  assert.match(renderSpec(spec(null, 'Checkout')).html, /<html lang="en">/);
+  const bad = renderSpec(spec('english!', 'x'));
+  assert.equal(bad.ok, false);
+  assert.match(bad.problems[0].fix, /zh-CN/);
+});

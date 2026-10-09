@@ -106,7 +106,7 @@ export function skinCss({ skin = 'light', brand = {} } = {}) {
 // Diagram stylesheet: classes used inside the SVG. Kept separate from the
 // page/viewer CSS so the SVG export can embed exactly this block.
 export const DIAGRAM_CSS = `
-.sc-svg{font-family:${FONT.sans};color:var(--sc-ink)}
+.sc-svg{font-family:${FONT.sans};color:var(--sc-ink);direction:ltr}
 .sc-mark{opacity:.88;pointer-events:none}
 .sc-mark-word{fill:var(--sc-ink)}
 .sc-bg{fill:var(--sc-paper)}
