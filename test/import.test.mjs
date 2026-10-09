@@ -23,7 +23,7 @@ const EXPECT = {
   'api.yaml': ['architecture', 4, 3], 'sales.csv': ['bar'], 'flows.csv': ['sankey'], 'trend.csv': ['line'], 'readme.md': ['flowchart', 3, 2],
 };
 
-for (const f of readdirSync(FIX)) {
+for (const f of readdirSync(FIX, { withFileTypes: true }).filter((d) => d.isFile()).map((d) => d.name)) {
   test(`import ${f}`, () => {
     const [type, count, edges] = EXPECT[f] || [];
     const r = importFile(join(FIX, f), { out: join(out, `${f.replace(/\W/g, '_')}.json`) });

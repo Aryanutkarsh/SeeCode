@@ -46,7 +46,15 @@ const { pos, flags } = args(rest);
 switch (cmd) {
   case 'render':
   case 'validate': {
-    if (!pos[0]) fail('usage: seecode.mjs render <spec.json> [--patch <json>] [--motion <preset>]');
+    if (!pos[0]) fail('usage: seecode.mjs render <spec.json | folder> [--patch <json>] [--motion <preset>]');
+    const { isDir, renderFolder } = await import('./lib/folder.mjs');
+    if (cmd === 'render' && isDir(resolve(pos[0]))) {
+      if (flags.patch) fail('--patch takes one spec file, not a folder');
+      const r = renderFolder(resolve(pos[0]), { motion: flags.motion });
+      print(r);
+      if (!r.ok) process.exit(1);
+      break;
+    }
     const specPath = resolve(pos[0]);
     let spec = readSpec(specPath);
     if (flags.patch) {
@@ -129,13 +137,20 @@ switch (cmd) {
   }
   case 'export': {
     const { exportDiagram } = await import('./lib/export/export.mjs');
-    if (!pos[0]) fail('usage: seecode.mjs export <diagram.html> [--for pdf|docs|word|gdocs|notion|confluence|readme|slides|gslides|figma|social|video|animated] [--formats png,svg,gif,mp4]');
+    if (!pos[0]) fail('usage: seecode.mjs export <diagram.html | folder> [--for pdf|docs|word|gdocs|notion|confluence|readme|slides|gslides|figma|social|video|animated] [--formats png,svg,gif,mp4] [--zip]');
+    const { isDir, exportFolder } = await import('./lib/folder.mjs');
+    if (isDir(resolve(pos[0]))) {
+      const r = await exportFolder(resolve(pos[0]), flags, exportDiagram);
+      print(r);
+      if (!r.ok) process.exit(1);
+      break;
+    }
     print(await exportDiagram(resolve(pos[0]), flags));
     break;
   }
   case 'import': {
     const { importFile } = await import('./lib/importers/import.mjs');
-    if (!pos[0]) fail('usage: seecode.mjs import <file>');
+    if (!pos[0]) fail('usage: seecode.mjs import <file> [--block N] [--all] [--out <path>]');
     print(importFile(resolve(pos[0]), flags));
     break;
   }

@@ -9,6 +9,8 @@ import { parseDot } from './dot.mjs';
 import { parsePlantUml } from './plantuml.mjs';
 import { parseD2 } from './d2.mjs';
 import { parseDrawio, parseExcalidraw, extractDrawioXml } from './canvas.mjs';
+import { splitUnits } from './units.mjs';
+import { slugify } from '../page.mjs';
 import { parseStructurizr, parseBpmn, parseSql, parsePrisma, parseDbml, parseOpenApi } from './models.mjs';
 import { readTable } from '../data.mjs';
 import { clean } from './common.mjs';
@@ -16,7 +18,6 @@ import { compactJson, renderSpec } from '../render.mjs';
 import { status as configStatus } from '../config/config.mjs';
 
 const MERMAID_HEADS = /^(flowchart|graph|sequenceDiagram|stateDiagram(-v2)?|erDiagram|classDiagram(-v2)?|gantt|pie|mindmap|journey|timeline|quadrantChart|sankey(-beta)?|xychart(-beta)?|gitGraph|block(-beta)?|architecture(-beta)?|C4\w+)\b/m;
-const FENCE = /```\s*(mermaid|dot|graphviz|plantuml|puml|d2)\s*\n([\s\S]*?)```/g;
 
 export function detect(name, text) {
   const n = name.toLowerCase();
@@ -134,73 +135,127 @@ function toSpec(m) {
   }
 }
 
+// Parse one diagram (a unit from splitUnits) into a spec, or { error, fix }.
+function parseUnit(u) {
+  let model;
+  try {
+    switch (u.format) {
+      case 'mermaid': model = parseMermaid(u.source); break;
+      case 'dot': model = parseDot(u.source); break;
+      case 'plantuml': model = parsePlantUml(u.source); break;
+      case 'd2': model = parseD2(u.source); break;
+      case 'drawio': model = parseDrawio(u.source); break;
+      case 'excalidraw': model = parseExcalidraw(u.source); break;
+      case 'structurizr': model = parseStructurizr(u.source); break;
+      case 'bpmn': model = parseBpmn(u.source); break;
+      case 'sql': model = parseSql(u.source); break;
+      case 'prisma': model = parsePrisma(u.source); break;
+      case 'dbml': model = parseDbml(u.source); break;
+      case 'openapi': model = parseOpenApi(u.source); break;
+      default: return { error: `no importer for ${u.format}` };
+    }
+  } catch (e) {
+    return { error: `parse failed: ${String(e.message).split('\n')[0]}`, fix: 'read the file yourself and write a spec by hand (say no parser was used)' };
+  }
+  if (!model || model.error) return { error: model?.error || 'nothing parsed', fix: model?.fix || 'read the file yourself and write a spec by hand' };
+  const notes = [];
+  if (model.note) notes.push(model.note);
+  if (model.dropped) notes.push(`${model.dropped} column(s) beyond 12 per table were dropped`);
+  if (model.ops) notes.push(`${model.ops} operations grouped by tag`);
+  const spec = toSpec(model);
+  if (!spec) return { error: `cannot map ${model.kind}` };
+  // the diagram's own title first, then the heading or page name around it
+  if (!spec.title && u.title) spec.title = clean(u.title, 60);
+  return { spec, notes };
+}
+
 export function importFile(path, flags = {}) {
   if (!existsSync(path)) return { ok: false, error: `not found: ${path}` };
   const buf = readFileSync(path);
   const name = basename(path);
   const text = /\.png$/i.test(name) ? '' : buf.toString('utf8');
-  let format = flags.format || detect(name, text);
+  const format = flags.format || detect(name, text);
   if (!format) return { ok: false, error: 'unrecognized format', fix: 'read the file yourself and write a spec by hand (say no parser was used)' };
   const settings = configStatus(process.cwd()).settings;
   const stem = basename(name).replace(/(\.drawio)?\.[^.]+$/, '').replace(/[^\w-]+/g, '-');
-  const out = flags.out ? resolve(flags.out) : resolve(settings.outputDir || 'diagrams', `${stem}.json`);
-  const notes = [];
-  let model;
-  let source = text;
-  if (format === 'markdown') {
-    const blocks = [...text.matchAll(FENCE)].map((m) => ({ lang: m[1], code: m[2] }));
-    if (!blocks.length) return { ok: false, error: 'no ```mermaid/dot/plantuml/d2 blocks in this markdown file' };
-    const i = Number(flags.block || 0);
-    if (blocks.length > 1) notes.push(`${blocks.length} diagram blocks found; imported #${i} (${blocks[i]?.lang}). Use --block N for others: ${blocks.map((b, k) => `${k}:${b.lang}`).join(' ')}`);
-    const b = blocks[i];
-    if (!b) return { ok: false, error: `no block #${i}` };
-    source = b.code;
-    format = { mermaid: 'mermaid', dot: 'dot', graphviz: 'dot', plantuml: 'plantuml', puml: 'plantuml', d2: 'd2' }[b.lang];
+  if (format === 'data' || format === 'json') {
+    const out = flags.out ? resolve(flags.out) : resolve(settings.outputDir || 'diagrams', `${stem}.json`);
+    return importData(path, format, text, stem, out, flags);
   }
+  let units;
   try {
-    switch (format) {
-      case 'mermaid': model = parseMermaid(source); break;
-      case 'dot': model = parseDot(source); break;
-      case 'plantuml': model = parsePlantUml(source); break;
-      case 'd2': model = parseD2(source); break;
-      case 'drawio': model = parseDrawio(extractDrawioXml(buf, name)); break;
-      case 'excalidraw': model = parseExcalidraw(source); break;
-      case 'structurizr': model = parseStructurizr(source); break;
-      case 'bpmn': model = parseBpmn(source); break;
-      case 'sql': model = parseSql(source); break;
-      case 'prisma': model = parsePrisma(source); break;
-      case 'dbml': model = parseDbml(source); break;
-      case 'openapi': model = parseOpenApi(source); break;
-      case 'data':
-      case 'json': {
-        let rows;
-        if (format === 'json') {
-          const j = JSON.parse(source);
-          if (!Array.isArray(j) && !(j.data || j.rows)) {
-            model = { kind: 'tree', title: clean(stem, 60), root: { label: clean(stem, 36), children: jsonTree(j) } };
-            break;
-          }
-          rows = Array.isArray(j) ? j : j.data || j.rows;
-        } else rows = readTable(path);
-        const rel = relative(dirname(out), path).split('\\').join('/');
-        const r = inferData(rows, rel, stem);
-        if (r.error) return { ok: false, error: r.error, fix: 'write a chart spec by hand; see references/types/bar.md' };
-        notes.push(`data stays in ${rel} (${rows.length} rows); chart chosen because: ${r.why}`);
-        return finish(r.spec, out, format, notes, flags);
-      }
-      default: return { ok: false, error: `no importer for ${format}` };
-    }
+    units = splitUnits(format, format === 'drawio' ? extractDrawioXml(buf, name) : text);
   } catch (e) {
     return { ok: false, error: `parse failed: ${String(e.message).split('\n')[0]}`, fix: 'read the file yourself and write a spec by hand (say no parser was used)' };
   }
-  if (!model || model.error) return { ok: false, error: model?.error || 'nothing parsed', fix: model?.fix || 'read the file yourself and write a spec by hand' };
-  if (model.note) notes.push(model.note);
-  if (model.dropped) notes.push(`${model.dropped} column(s) beyond 12 per table were dropped`);
-  if (model.ops) notes.push(`${model.ops} operations grouped by tag`);
-  const spec = toSpec(model);
-  if (!spec) return { ok: false, error: `cannot map ${model.kind}` };
-  if (!spec.title) spec.title = clean(stem.replace(/[-_]+/g, ' '), 60);
-  return finish(spec, out, format, notes, flags);
+  if (!units.length) return { ok: false, error: 'no ```mermaid/dot/plantuml/d2 blocks in this markdown file' };
+  if (flags.all) return importAll(units, { format, stem, settings, flags });
+
+  const out = flags.out ? resolve(flags.out) : resolve(settings.outputDir || 'diagrams', `${stem}.json`);
+  const i = Number(flags.block ?? flags.page ?? 0);
+  const u = units[i];
+  if (!u) return { ok: false, error: `no diagram #${i} (this file has ${units.length}: 0–${units.length - 1})` };
+  const notes = [];
+  if (units.length > 1) {
+    const list = units.map((x, k) => `${k}:${x.title || x.lang || x.format}`).join(' | ');
+    notes.push(`${units.length} diagrams in this file; imported #${i}. Use --block N for another, or --all for one spec per diagram in a folder: ${list}`);
+  }
+  const r = parseUnit(u);
+  if (r.error) return { ok: false, error: r.error, ...(r.fix ? { fix: r.fix } : {}) };
+  if (!r.spec.title) r.spec.title = clean(stem.replace(/[-_]+/g, ' '), 60);
+  return finish(r.spec, out, u.format, [...notes, ...r.notes], flags);
+}
+
+// --all: every diagram in the file becomes <folder>/NN-<slug>.json, in
+// source order, named after its title (diagram title, heading, page name).
+function importAll(units, { format, stem, settings, flags }) {
+  const folder = flags.out ? resolve(flags.out) : resolve(settings.outputDir || 'diagrams', stem);
+  mkdirSync(folder, { recursive: true });
+  const width = String(units.length).length < 2 ? 2 : String(units.length).length;
+  const used = new Set();
+  const diagrams = units.map((u, k) => {
+    const index = k + 1;
+    const r = parseUnit(u);
+    if (r.error) return { index, ...(u.title ? { title: u.title } : {}), error: r.error };
+    if (!r.spec.title) r.spec.title = clean(`${stem.replace(/[-_]+/g, ' ')} ${index}`, 60);
+    let base = `${String(index).padStart(width, '0')}-${slugify(r.spec.title)}`;
+    for (let n = 2; used.has(base); n++) base = `${base}-${n}`;
+    used.add(base);
+    const res = finish(r.spec, join(folder, `${base}.json`), u.format, r.notes, {});
+    return { index, title: r.spec.title, type: res.type, draft: res.draft, ...(res.problems ? { problems: res.problems } : {}) };
+  });
+  const ok = diagrams.filter((d) => !d.error);
+  return {
+    ok: ok.length > 0,
+    format,
+    folder,
+    count: diagrams.length,
+    diagrams,
+    ...(ok.length < diagrams.length ? { failed: diagrams.length - ok.length } : {}),
+    next: `SC render ${folder} — renders every spec and writes index.html; then SC export ${folder} --for <destination>`,
+  };
+}
+
+function importData(path, format, source, stem, out, flags) {
+  const notes = [];
+  let rows;
+  try {
+    if (format === 'json') {
+      const j = JSON.parse(source);
+      if (!Array.isArray(j) && !(j.data || j.rows)) {
+        const spec = toSpec({ kind: 'tree', title: clean(stem, 60), root: { label: clean(stem, 36), children: jsonTree(j) } });
+        return finish(spec, out, format, notes, flags);
+      }
+      rows = Array.isArray(j) ? j : j.data || j.rows;
+    } else rows = readTable(path);
+  } catch (e) {
+    return { ok: false, error: `parse failed: ${String(e.message).split('\n')[0]}`, fix: 'read the file yourself and write a spec by hand (say no parser was used)' };
+  }
+  const rel = relative(dirname(out), path).split('\\').join('/');
+  const r = inferData(rows, rel, stem);
+  if (r.error) return { ok: false, error: r.error, fix: 'write a chart spec by hand; see references/types/bar.md' };
+  notes.push(`data stays in ${rel} (${rows.length} rows); chart chosen because: ${r.why}`);
+  return finish(r.spec, out, format, notes, flags);
 }
 
 function finish(specIn, out, format, notes, flags) {

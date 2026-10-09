@@ -1,0 +1,9 @@
+<mxfile><diagram id="p1" name="Overview"><mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/>
+<mxCell id="a" value="Web" vertex="1" parent="1"><mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>
+<mxCell id="b" value="API" vertex="1" parent="1"><mxGeometry x="200" y="0" width="80" height="40" as="geometry"/></mxCell>
+<mxCell id="e" edge="1" source="a" target="b" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+</root></mxGraphModel></diagram><diagram id="p2" name="Data &amp; storage"><mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/>
+<mxCell id="c" value="API" vertex="1" parent="1"><mxGeometry x="0" y="0" width="80" height="40" as="geometry"/></mxCell>
+<mxCell id="d" value="Postgres" style="shape=cylinder;" vertex="1" parent="1"><mxGeometry x="200" y="0" width="80" height="60" as="geometry"/></mxCell>
+<mxCell id="f" edge="1" source="c" target="d" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+</root></mxGraphModel></diagram></mxfile>

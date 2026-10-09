@@ -26,6 +26,8 @@ Each file in the JSON result reports `width`, `height` and `scale`. The HTML's o
 - **Offline or behind a proxy:** if web fonts don't load within 15 s, export finishes with fallback fonts and adds a `W_FONTS` warning instead of hanging. Retry online for the real typography, or set `SEECODE_LOAD_TIMEOUT_MS` to wait longer.
 - `SC doctor` reports anything that's missing.
 
+**A folder of diagrams** (from `SC import <file> --all`, or any folder of specs): `SC render <folder>` renders each spec to HTML beside it and writes `index.html` linking them in order. `SC export <folder> --for <destination>` (or `--formats …`) exports every diagram, each next to its own HTML (`01-request-flow.png`, `01-request-flow.svg`…). `--zip` also writes `<folder>.zip` with everything in it.
+
 **Where each format comes from**
 - **SVG** is built in plain Node, so it works with no browser, including the Claude.ai sandbox.
 - **PNG, JPEG, WebP, GIF, MP4 and WebM** from the CLI need a Chrome-family browser.

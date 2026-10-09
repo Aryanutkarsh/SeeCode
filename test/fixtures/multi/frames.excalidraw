@@ -1,0 +1,14 @@
+{"type":"excalidraw","elements":[
+{"id":"f1","type":"frame","name":"Before","x":0,"y":0,"width":500,"height":200},
+{"id":"f2","type":"frame","name":"After","x":0,"y":300,"width":500,"height":200},
+{"id":"a","type":"rectangle","frameId":"f1","x":20,"y":40,"width":120,"height":60,"boundElements":[{"id":"ta","type":"text"}]},
+{"id":"ta","type":"text","text":"Monolith","containerId":"a","frameId":"f1","x":30,"y":60,"width":80,"height":20},
+{"id":"b","type":"rectangle","frameId":"f1","x":300,"y":40,"width":120,"height":60,"boundElements":[{"id":"tb","type":"text"}]},
+{"id":"tb","type":"text","text":"Database","containerId":"b","frameId":"f1","x":310,"y":60,"width":80,"height":20},
+{"id":"ab","type":"arrow","frameId":"f1","x":140,"y":70,"width":160,"height":0,"startBinding":{"elementId":"a"},"endBinding":{"elementId":"b"},"endArrowhead":"arrow"},
+{"id":"c","type":"rectangle","frameId":"f2","x":20,"y":340,"width":120,"height":60,"boundElements":[{"id":"tc","type":"text"}]},
+{"id":"tc","type":"text","text":"Orders service","containerId":"c","frameId":"f2","x":30,"y":360,"width":80,"height":20},
+{"id":"d","type":"rectangle","frameId":"f2","x":300,"y":340,"width":120,"height":60,"boundElements":[{"id":"td","type":"text"}]},
+{"id":"td","type":"text","text":"Orders DB","containerId":"d","frameId":"f2","x":310,"y":360,"width":80,"height":20},
+{"id":"cd","type":"arrow","frameId":"f2","x":140,"y":370,"width":160,"height":0,"startBinding":{"elementId":"c"},"endBinding":{"elementId":"d"},"endArrowhead":"arrow"}
+]}

@@ -1,0 +1,13 @@
+---
+title: Signup flow
+---
+flowchart LR
+  a[Form] --> b[Verify email] --> c[Welcome]
+
+---
+title: Billing states
+---
+stateDiagram-v2
+  [*] --> Trial
+  Trial --> Paid
+  Paid --> [*]

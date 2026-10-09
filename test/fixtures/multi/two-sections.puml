@@ -1,0 +1,14 @@
+@startuml login
+title Login
+actor User
+User -> App : sign in
+App -> IdP : redirect
+IdP --> App : token
+@enduml
+
+@startuml logout
+title Logout
+actor User
+User -> App : sign out
+App -> IdP : revoke
+@enduml

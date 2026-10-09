@@ -214,6 +214,19 @@ Turn docs/architecture.mmd into a SeeCode diagram for my deck, simplified for ex
 | SQL · Prisma · DBML | `.sql` · `.prisma` · `.dbml` |
 | OpenAPI · data | `.yaml`/`.json` · `.csv` `.tsv` `.json` |
 
+**One file, many diagrams?** A design doc with several Mermaid blocks, a draw.io file with several pages or a board with frames comes out as a folder, one diagram per file, numbered in order and named after its heading or page, plus an `index.html` to browse them:
+
+```text
+Use SeeCode to redraw every diagram in docs/design.md and export them for Confluence.
+```
+
+```text
+diagrams/design/
+  01-request-flow.html   01-request-flow.svg   01-request-flow.png
+  02-payment-sequence.html   …
+  index.html
+```
+
 You get a short report of what was merged or dropped. Source colours, fonts and coordinates never carry over. Or point it at code: *"diagram this repo"* scans the repository first, and each node can link back to the files it came from.
 
 ## Export for wherever it goes
