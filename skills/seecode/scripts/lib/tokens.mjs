@@ -1,5 +1,7 @@
 // Design tokens and the shared diagram stylesheet.
 import { expandRoles, rgba } from './color.mjs';
+import { AXON_CSS } from './render/structure/axon.mjs';
+import { DETAIL_CSS } from './render/structure/iso-detail.mjs';
 // Every renderer emits class names only; colors live here as CSS custom
 // properties so the light/dark toggle and skins never touch SVG markup.
 
@@ -13,6 +15,7 @@ export const SKINS = {
     accent: '#2f54eb', 'accent-tint': 'rgba(47,84,235,0.08)', link: '#0f7f81',
     node: '#ffffff', 'store': 'rgba(29,36,51,0.05)', external: 'rgba(29,36,51,0.025)',
     'series-1': '#6b8f71', 'series-2': '#c08a3e', 'series-3': '#8a6fb0', 'series-4': '#b5604b', 'series-5': '#5f7f9e',
+    'ax-shade': '#1d2433', 'ax-lift': '#ffffff', 'ax-screen': '#2b3040', 'ax-dark-edge': 'rgba(255,255,255,0)', 'ax-t-o': '0', 'ax-l-o': '0.07', 'ax-r-o': '0.16',
   },
   // dark is a neutral #1a1a1a, never pure black
   dark: {
@@ -21,6 +24,7 @@ export const SKINS = {
     accent: '#7b93ff', 'accent-tint': 'rgba(123,147,255,0.14)', link: '#3cc6c4',
     node: '#202020', store: 'rgba(232,230,227,0.05)', external: 'rgba(232,230,227,0.025)',
     'series-1': '#8fb394', 'series-2': '#d9a95f', 'series-3': '#a993cc', 'series-4': '#d0806b', 'series-5': '#86a5c4',
+    'ax-shade': '#000000', 'ax-lift': '#ffffff', 'ax-screen': '#07080b', 'ax-dark-edge': 'rgba(255,255,255,0.34)', 'ax-t-o': '0.06', 'ax-l-o': '0.2', 'ax-r-o': '0.42',
   },
   terminal: {
     paper: '#1a1a1a', 'paper-2': '#222222', ink: '#f2f2f2', 'ink-strong': '#ffffff',
@@ -28,6 +32,7 @@ export const SKINS = {
     accent: '#39d98a', 'accent-tint': 'rgba(57,217,138,0.10)', link: '#5cc8ff',
     node: '#202020', store: 'rgba(242,242,242,0.04)', external: 'rgba(242,242,242,0.02)',
     'series-1': '#39d98a', 'series-2': '#5cc8ff', 'series-3': '#f5c542', 'series-4': '#ff7a59', 'series-5': '#b48cff',
+    'ax-shade': '#000000', 'ax-lift': '#ffffff', 'ax-screen': '#07080b', 'ax-dark-edge': 'rgba(255,255,255,0.34)', 'ax-t-o': '0.06', 'ax-l-o': '0.2', 'ax-r-o': '0.42',
   },
 };
 
@@ -321,4 +326,4 @@ export const DIAGRAM_CSS = `
 .wm-ghost{fill:none;stroke:var(--sc-accent);stroke-dasharray:2 2}
 .wm-inertia{stroke:var(--sc-ink);stroke-width:3}
 .callout{fill:var(--sc-muted);font-family:${FONT.serif};font-style:italic;font-size:13px}
-`;
+${AXON_CSS}${DETAIL_CSS}`;

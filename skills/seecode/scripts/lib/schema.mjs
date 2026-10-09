@@ -70,7 +70,10 @@ export function validate(schema, value, root = schema, path = '', out = []) {
     const results = schema[key].map((s) => validate(s, value, root, path, []));
     const ok = results.filter((r) => r.length === 0).length;
     if (key === 'anyOf' ? ok === 0 : ok !== 1) {
-      const best = results.reduce((a, b) => (b.length < a.length ? b : a));
+      // report the branch of the right type (an object's own errors, not
+      // "expected string" from the string branch)
+      const typed = results.filter((r) => !r.some((e) => e.at === at && e.msg.startsWith('expected ')));
+      const best = (typed.length ? typed : results).reduce((a, b) => (b.length < a.length ? b : a));
       out.push(...(best.length ? best : [{ at, msg: `must match exactly one allowed shape` }]));
     }
   }

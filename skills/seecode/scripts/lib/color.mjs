@@ -117,5 +117,10 @@ export function expandRoles({ paper, ink, accent, link, muted }, base) {
     out['accent-tint'] = rgba(accent, dark ? 0.14 : 0.1);
   }
   if (link) out.link = link;
+  // isometric face shading follows the paper: darken toward ink on light
+  // paper, toward black (with a slight top highlight) on dark paper
+  Object.assign(out, dark
+    ? { 'ax-shade': '#000000', 'ax-lift': '#ffffff', 'ax-screen': '#07080b', 'ax-dark-edge': 'rgba(255,255,255,0.34)', 'ax-t-o': '0.06', 'ax-l-o': '0.2', 'ax-r-o': '0.42' }
+    : { 'ax-shade': ink, 'ax-lift': '#ffffff', 'ax-screen': mix(ink, '#2b3040', 0.5), 'ax-dark-edge': 'rgba(255,255,255,0)', 'ax-t-o': '0', 'ax-l-o': '0.07', 'ax-r-o': '0.16' });
   return out;
 }
