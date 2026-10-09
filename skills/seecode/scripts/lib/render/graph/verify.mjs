@@ -8,6 +8,7 @@ const RUN = 4; // shared or border-riding length that becomes visible
 const PORT_GAP = 12; // ports on one side keep this far apart…
 const PORT_GAP_SHORT = 8; // …or this on a side shorter than 48px
 const POINT = new Set(['decision', 'start', 'end']);
+const CORNER = 6; // the box corner radius: a port closer than this sits on the curve
 
 function segments(e) {
   const p = e.route, out = [];
@@ -29,6 +30,18 @@ function span(a0, a1, b0, b1) {
 }
 
 const name = (e) => `${e.from}→${e.to}`;
+const flip = (s) => ({ a: s.b, b: s.a });
+
+// How many leading segments two routes share as one trunk: identical
+// segments, plus the segment where they part (same start, same direction).
+// Used on reversed routes to find where edges merge into a shared target.
+function trunk(as, bs) {
+  let k = 0;
+  const same = (p, q) => Math.abs(p.x - q.x) < EPS && Math.abs(p.y - q.y) < EPS;
+  while (k < as.length && k < bs.length && same(as[k].a, bs[k].a) && same(as[k].b, bs[k].b)) k++;
+  if (k < as.length && k < bs.length && same(as[k].a, bs[k].a) && overlap(as[k], bs[k]) > 0) k++;
+  return k;
+}
 
 export function checkRoutes(nodes, edges) {
   const problems = [];
@@ -41,20 +54,39 @@ export function checkRoutes(nodes, edges) {
     }
   }
 
-  // 2. two connectors stacked on one line read as one. Edges that share a
-  // source fan out from one trunk on purpose, so they may overlap.
+  // 2. two connectors stacked on one line read as one. Edges from one source
+  // fan out along a shared bus on purpose (the router merges them), so they
+  // may overlap anywhere; edges into one target may share only the final
+  // stretch where they merge into it.
   const segs = routed.map((e) => ({ e, s: segments(e) }));
   const stacked = new Set();
   for (let i = 0; i < segs.length; i++) {
     for (let j = i + 1; j < segs.length; j++) {
       const A = segs[i], B = segs[j];
+      let as = A.s, bs = B.s;
       if (A.e.from === B.e.from) continue;
-      const len = Math.max(0, ...A.s.flatMap((s) => B.s.map((t) => overlap(s, t))));
+      if (A.e.to === B.e.to) {
+        const k = trunk([...as].reverse().map(flip), [...bs].reverse().map(flip));
+        as = as.slice(0, as.length - k); bs = bs.slice(0, bs.length - k);
+      }
+      const len = Math.max(0, ...as.flatMap((s) => bs.map((t) => overlap(s, t))));
       if (len <= RUN) continue;
       const key = [A.e.id, B.e.id].sort().join('|');
       if (stacked.has(key)) continue;
       stacked.add(key);
       problems.push({ code: 'W_ROUTE_STACKED', at: `edges.${B.e.id}`, msg: `${name(A.e)} and ${name(B.e)} share ${Math.round(len)}px of one line`, fix: `move "${B.e.from}" or "${B.e.to}" one row/col so the two paths separate` });
+    }
+  }
+
+  // 3b. a port in a box's rounded corner looks detached from the box
+  for (const e of routed) {
+    for (const [id, side, p] of [[e.from, e.sS, e.route[0]], [e.to, e.sT, e.route[e.route.length - 1]]]) {
+      const n = nodes.find((m) => m.id === id);
+      if (!n || !side || POINT.has(n.shape)) continue;
+      const [lo, len, v] = side === 'L' || side === 'R' ? [n.y, n.h, p.y] : [n.x, n.w, p.x];
+      const gap = Math.min(v - lo, lo + len - v);
+      if (gap >= CORNER - EPS) continue;
+      problems.push({ code: 'W_ROUTE_CORNER', at: `edges.${e.id}`, msg: `${name(e)} meets "${id}" ${Math.max(0, Math.round(gap))}px from its corner`, fix: `give "${id}" fewer connectors on that side, or move the other end so the line meets the side nearer its middle` });
     }
   }
 

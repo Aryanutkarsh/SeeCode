@@ -39,3 +39,20 @@ test('a connector riding along a box border is reported', () => {
   const nodes = [box('a', 0, 0), box('m', 150, 30), box('b', 300, 0)];
   assert.deepEqual(codes(checkRoutes(nodes, [edge('a', 'b', [[100, 30], [300, 30]])])), ['W_ROUTE_BORDER']);
 });
+
+test('edges into one target may merge on its final stretch, but not overlap earlier', () => {
+  const nodes = [box('a', 0, 0), box('c', 0, 200), box('t', 400, 100)];
+  // both arrive along y=130 into t's left side: a merge
+  const at = edge('a', 't', [[100, 30], [300, 30], [300, 130], [400, 130]]);
+  const ct = edge('c', 't', [[100, 230], [300, 230], [300, 130], [400, 130]]);
+  assert.deepEqual(checkRoutes(nodes, [at, ct]).filter((p) => p.code === 'W_ROUTE_STACKED'), []);
+  // a different target: the same overlap is stacking
+  const nodes2 = [...nodes, box('u', 400, 300)];
+  const cu = edge('c', 'u', [[100, 230], [300, 230], [300, 130], [380, 130], [380, 330], [400, 330]]);
+  assert.deepEqual(codes(checkRoutes(nodes2, [at, cu])).filter((c) => c === 'W_ROUTE_STACKED'), ['W_ROUTE_STACKED']);
+});
+
+test('a port inside a box corner is reported', () => {
+  const nodes = [box('a', 0, 0), box('b', 300, 0)];
+  assert.deepEqual(codes(checkRoutes(nodes, [edge('a', 'b', [[100, 3], [300, 3]])])), ['W_ROUTE_CORNER', 'W_ROUTE_CORNER']);
+});
