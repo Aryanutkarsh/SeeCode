@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { renderSpec } from '../skills/seecode/scripts/lib/render.mjs';
 import { exportDiagram, launchBrowser } from '../skills/seecode/scripts/lib/export/export.mjs';
 
@@ -47,7 +48,7 @@ test('the HTML exports PNG/SVG/GIF/MP4 by itself (in-page menu)', { skip, timeou
   const { browser } = await launch();
   try {
     const p = await browser.newPage({ viewport: { width: 1200, height: 700 } });
-    await p.goto(`file://${html}`);
+    await p.goto(pathToFileURL(html).href);
     for (const kind of ['png', 'svg', 'gif', 'mp4']) {
       const r = await p.evaluate(async (k) => {
         window.SeeCode.lastExport = null;
@@ -82,7 +83,7 @@ test('export size adapts to the content', { skip, timeout: 60000 }, async () => 
       const html = join(dir, `${name}.html`);
       writeFileSync(html, renderSpec(spec).html);
       const p = await browser.newPage({ viewport: { width: 1200, height: 700 } });
-      await p.goto(`file://${html}`);
+      await p.goto(pathToFileURL(html).href);
       plans[name] = await p.evaluate(() => Object.fromEntries(['png', 'gif', 'mp4'].map((f) => [f, window.SeeCode.exportPlan(f)])));
       await p.close();
     }

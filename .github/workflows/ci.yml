@@ -11,6 +11,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         node: [20, 22]
+        # Windows on 22 only: cmd.exe leaves test/*.test.mjs unexpanded, and
+        # node --test expands globs itself only from Node 21
+        include:
+          - os: windows-latest
+            node: 22
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
