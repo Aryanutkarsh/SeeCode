@@ -1,0 +1,87 @@
+{
+    "type": "sequence",
+    "eyebrow": "时序图",
+    "title": "租房的来回沟通",
+    "subtitle": "从看房到拿到钥匙",
+    "lang": "zh-CN",
+    "participants": [
+        {
+            "id": "me",
+            "label": "租客",
+            "sub": "我",
+            "focal": true,
+            "icon": "person"
+        },
+        {
+            "id": "agent",
+            "label": "中介",
+            "icon": "briefcase"
+        },
+        {
+            "id": "owner",
+            "label": "房东",
+            "kind": "external",
+            "icon": "home"
+        }
+    ],
+    "messages": [
+        [
+            "me",
+            "agent",
+            "预约看房"
+        ],
+        [
+            "agent",
+            "owner",
+            "确认看房时间"
+        ],
+        [
+            "owner",
+            "agent",
+            "周六上午可以",
+            "reply"
+        ],
+        [
+            "agent",
+            "me",
+            "带看房子",
+            "reply"
+        ],
+        [
+            "me",
+            "agent",
+            "谈租金和押金"
+        ],
+        [
+            "agent",
+            "owner",
+            "转达还价"
+        ],
+        [
+            "owner",
+            "me",
+            "同意，签合同",
+            "reply"
+        ],
+        [
+            "me",
+            "owner",
+            "付押金和首月租金"
+        ],
+        [
+            "owner",
+            "me",
+            "交钥匙",
+            "reply"
+        ]
+    ],
+    "fragments": [
+        {
+            "kind": "loop",
+            "label": "直到双方同意",
+            "from": 4,
+            "to": 6
+        }
+    ],
+    "numbered": true
+}

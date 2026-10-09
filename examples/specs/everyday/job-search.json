@@ -1,0 +1,115 @@
+{
+    "type": "state",
+    "eyebrow": "状态图",
+    "title": "求职申请走到哪一步了",
+    "lang": "zh-CN",
+    "nodes": [
+        {
+            "id": "s",
+            "shape": "start",
+            "row": 0,
+            "col": 0
+        },
+        {
+            "id": "applied",
+            "label": "已投递简历",
+            "row": 0,
+            "col": 1,
+            "icon": "document"
+        },
+        {
+            "id": "screen",
+            "label": "电话初筛",
+            "row": 0,
+            "col": 2,
+            "icon": "phone"
+        },
+        {
+            "id": "onsite",
+            "label": "现场面试和作业题",
+            "row": 0,
+            "col": 3,
+            "focal": true,
+            "icon": "people"
+        },
+        {
+            "id": "offer",
+            "label": "收到录用通知",
+            "row": 0,
+            "col": 4,
+            "icon": "check"
+        },
+        {
+            "id": "rejected",
+            "label": "未通过",
+            "kind": "muted",
+            "row": 1,
+            "col": 2
+        },
+        {
+            "id": "e",
+            "shape": "end",
+            "row": 1,
+            "col": 4
+        }
+    ],
+    "edges": [
+        [
+            "s",
+            "applied"
+        ],
+        [
+            "applied",
+            "screen",
+            "HR 联系",
+            "primary"
+        ],
+        [
+            "screen",
+            "onsite",
+            "约面试",
+            "primary"
+        ],
+        [
+            "onsite",
+            "offer",
+            "通过",
+            "primary"
+        ],
+        [
+            "screen",
+            "rejected",
+            "不合适"
+        ],
+        [
+            "onsite",
+            "rejected",
+            "不合适"
+        ],
+        [
+            "offer",
+            "e",
+            "接受"
+        ]
+    ],
+    "legend": {
+        "title": "图例",
+        "entries": {
+            "backend": {
+                "label": "进行中"
+            },
+            "focal": {
+                "label": "当前阶段"
+            },
+            "muted": {
+                "label": "已结束"
+            },
+            "primary": {
+                "label": "顺利的路径"
+            },
+            "default": {
+                "label": "其他结果"
+            }
+        }
+    }
+}

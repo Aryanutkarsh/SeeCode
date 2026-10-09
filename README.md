@@ -127,6 +127,21 @@ Every type animates its own way (systems trace their flows, sequences play messa
 
 <sub>Plus 15 variants: dumbbell, marimekko, slopegraph, bump, streamgraph, ridgeline, bubble, beeswarm, funnel, consultant quadrant, terminal loop, OAuth sequence, lifecycle state, block decomposition and vertical high-level. Specs for every example are in <a href="examples/specs/">examples/specs</a>.</sub>
 
+### Not just code
+
+The same types draw everyday things: a leave plan, where your pay goes, a back-and-forth with a landlord, where a job application stands. Labels can be in any language (set `lang`, and Chinese, Japanese and Korean labels wrap between characters), and the legend can use your own words.
+
+<table>
+<tr>
+  <td align="center" width="50%"><a href="docs/screenshots/leave-plan.png"><img src="docs/screenshots/leave-plan.png" alt="Timeline of a year of leave"></a><br><b>A year of leave</b><br><sub>Timeline</sub></td>
+  <td align="center" width="50%"><a href="docs/screenshots/monthly-money.png"><img src="docs/screenshots/monthly-money.png" alt="Sankey of where a month's pay goes"></a><br><b>Where the pay goes</b><br><sub>Sankey</sub></td>
+</tr>
+<tr>
+  <td align="center" width="50%"><a href="docs/screenshots/renting.png"><img src="docs/screenshots/renting.png" alt="Sequence diagram, in Chinese, of renting a flat"></a><br><b>租房的来回沟通</b> (renting)<br><sub>Sequence, in Chinese</sub></td>
+  <td align="center" width="50%"><a href="docs/screenshots/job-search.png"><img src="docs/screenshots/job-search.png" alt="State diagram, in Chinese, of a job application"></a><br><b>求职申请走到哪一步了</b> (job search)<br><sub>State, in Chinese, with a custom legend</sub></td>
+</tr>
+</table>
+
 ## See it in action
 
 Every HTML diagram is one self-contained file you can explore. Send it to anyone and the interactions go with it. These clips are recorded from real diagrams:

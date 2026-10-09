@@ -1,0 +1,17 @@
+{
+    "type": "timeline",
+    "title": "A year of leave, planned",
+    "subtitle": "25 days of leave and the long weekends around them",
+    "events": [
+        { "date": "Jan", "label": "Allowance resets", "sub": "25 days" },
+        { "date": "Apr", "label": "Easter bridge", "sub": "4 days, 10 off" },
+        { "date": "Jun", "label": "Summer trip", "sub": "10 days", "focal": true },
+        { "date": "Sep", "label": "Long weekend", "sub": "2 days" },
+        { "date": "Nov", "label": "Use or lose", "sub": "carry over 5 max" },
+        { "date": "Dec", "label": "Holidays", "sub": "6 days" }
+    ],
+    "periods": [
+        { "from": "Apr", "to": "Jun", "label": "book flights early" },
+        { "from": "Sep", "to": "Dec", "label": "spend what's left", "focal": true }
+    ]
+}

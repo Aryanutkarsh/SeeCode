@@ -1,0 +1,18 @@
+{
+    "type": "sankey",
+    "title": "Where a month's pay goes",
+    "unit": "$",
+    "nodes": [{ "id": "Savings", "label": "Savings", "focal": true }],
+    "links": [
+        ["Salary", "Take-home", 4200],
+        ["Side work", "Take-home", 600],
+        ["Take-home", "Rent", 1600],
+        ["Take-home", "Bills", 450],
+        ["Take-home", "Food", 700],
+        ["Take-home", "Transport", 250],
+        ["Take-home", "Fun", 500],
+        ["Take-home", "Savings", 1300],
+        ["Savings", "Emergency fund", 500],
+        ["Savings", "Retirement", 800]
+    ]
+}
