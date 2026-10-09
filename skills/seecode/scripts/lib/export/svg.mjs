@@ -3,6 +3,7 @@
 // Output is the settled end frame (motion off), theme variables resolved,
 // the diagram stylesheet inlined and, when the network allows, fonts embedded.
 import { embedFonts } from './fonts.mjs';
+import { scopeCss } from '../scope.mjs';
 
 const pick = (html, re) => (html.match(re) || [])[1];
 
@@ -28,7 +29,10 @@ export function svgFromHtml(html, { theme = 'light' } = {}) {
     .replace(/ style="[^"]*"/, '') // motion vars + max-width
     .replace(/ data-sc-motion="[^"]*"/, '');
   const imports = [fontsHref, ...brandHrefs].filter(Boolean).map((h) => `@import url('${h.replace(/&/g, '&amp;')}');`).join('');
-  const head = `<title id="${titleId}">${title}</title><style>${imports}${brandFaces.replace(/&/g, '&amp;').replace(/</g, '&lt;')}:root{${vars}}${css.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</style>`;
+  // scoped to this SVG's id, so several exports can share one page
+  const id = pick(svg, /^<svg[^>]* id="([^"]+)"/);
+  const rules = id ? scopeCss(`:root{${vars}}${css}`, id) : `:root{${vars}}${css}`;
+  const head = `<title id="${titleId}">${title}</title><style>${imports}${brandFaces.replace(/&/g, '&amp;').replace(/</g, '&lt;')}${rules.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</style>`;
   svg = svg.replace(/^(<svg[^>]*>)/, (m) => `${m.replace('<svg ', `<svg width="${vb[2]}" height="${vb[3]}" `)}${head}`);
   return svg;
 }

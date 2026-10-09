@@ -873,7 +873,9 @@
     const css = document.getElementById('sc-diagram-css').textContent;
     const style = document.createElementNS(NS, 'style');
     const fontRule = fonts || `@import url('${document.getElementById('sc-fonts').href}');`;
-    style.textContent = `${fontRule}:root{${vars}}${css}`;
+    // scoped to the diagram's id so several exports can share one page
+    const rules = `:root{${vars}}${css}`;
+    style.textContent = `${fontRule}${clone.id && typeof __scScopeCss === 'function' ? __scScopeCss(rules, clone.id) : rules}`;
     clone.insertBefore(style, clone.firstChild);
     const h1 = document.querySelector('.sc-title');
     if (h1 && !clone.querySelector('title')) {

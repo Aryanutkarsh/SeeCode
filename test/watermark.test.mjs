@@ -33,7 +33,7 @@ test('it gets its own strip, so it never covers the diagram', () => {
 test('lettering uses the ink colour; the mark survives SVG export', () => {
   const html = renderSpec(spec).html;
   assert.match(html, /\.sc-mark-word\{fill:var\(--sc-ink\)\}/);
-  assert.match(html, /<mask id="mark-mark"/);
+  assert.match(html, /<mask id="mark-[0-9a-z]+-mark"/, "the mask id is unique per diagram");
   const svg = svgFromHtml(html, { theme: 'dark' });
   assert.match(svg, /class="sc-mark"/);
   assert.match(svg, /xmlns:xlink="http:\/\/www\.w3\.org\/1999\/xlink"/);

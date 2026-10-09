@@ -22,3 +22,22 @@ for (const ex of exampleSpecs().filter((x) => ['architecture', 'sequence', 'bar'
     assert.doesNotMatch(style, /&(?!amp;|lt;|gt;|quot;)|</);
   });
 }
+
+test('exported SVGs scope their styles, so two can share one page', async () => {
+  const { scopeCss } = await import('../skills/seecode/scripts/lib/scope.mjs');
+  const a = renderSpec({ type: 'architecture', title: 'Same title', nodes: [{ id: 'a', label: 'A', row: 0, col: 0 }, { id: 'b', label: 'B', row: 0, col: 1 }], edges: [['a', 'b']] }).html;
+  const b = renderSpec({ type: 'architecture', title: 'Same title', nodes: [{ id: 'x', label: 'X', row: 0, col: 0 }, { id: 'y', label: 'Y', row: 0, col: 1 }], edges: [['x', 'y']] }).html;
+  const idOf = (h) => /<svg class="sc-svg[^"]*" id="([^"]+)"/.exec(h)[1];
+  assert.notEqual(idOf(a), idOf(b), 'same title, different diagrams, different ids');
+  for (const [html, theme] of [[a, 'light'], [b, 'dark']]) {
+    const svg = svgFromHtml(html, { theme });
+    const id = idOf(html);
+    const style = /<style>([\s\S]*?)<\/style>/.exec(svg)[1];
+    assert.doesNotMatch(style, /:root\{/, 'no page-wide variables');
+    assert.match(style, new RegExp(`#${id}\\{--sc-paper:`), 'variables live on the diagram');
+    assert.match(style, new RegExp(`#${id} \\.n-box\\{`), 'rules apply inside the diagram only');
+    assert.match(svg, new RegExp(`aria-labelledby="${id}-title ${id}-desc"`));
+  }
+  assert.equal(scopeCss(':root{--a:1}.sc-svg.x .y{a:b}.n,.m{c:d}@media (max-width:9px){.p{e:f}}@keyframes k{to{opacity:1}}', 'd'),
+    '#d{--a:1}#d.sc-svg.x .y{a:b}#d .n,#d .m{c:d}@media (max-width:9px){#d .p{e:f}}@keyframes k{to{opacity:1}}');
+});

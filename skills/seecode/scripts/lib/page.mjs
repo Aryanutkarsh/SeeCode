@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { el, esc } from './svg.mjs';
 import { FONTS_HREF, DIAGRAM_CSS, SKINS, ON_FILL, skinCss } from './tokens.mjs';
 import { legendLabels } from './render/shared/legend.mjs';
+import { scopeCss, shortHash } from './scope.mjs';
 import { cleanFonts } from './config/config.mjs';
 import { watermarkOn, watermarkSvg, MARK, FAVICON } from './mark.mjs';
 import { MOTION_CSS, motionVars } from './motion.mjs';
@@ -30,17 +31,21 @@ export function buildPage({ spec, result, preset, typeName, settings = {} }) {
   // the watermark gets its own strip under the diagram, so it never covers content
   const vh = mark ? vh0 + MARK.strip : vh0;
   const slug = slugify(spec.title || spec.type);
+  // ids inside the SVG: unique per diagram (two diagrams can share a title),
+  // stable across renders of the same spec
+  const uid = `${slug}-${shortHash(JSON.stringify(spec))}`;
   const title = spec.title || typeName;
   const desc = spec.subtitle || `${typeName} diagram${result.graph ? ` with ${result.graph.nodes.length} elements` : ''}.`;
   const motionAttr = preset && preset !== 'none' ? preset : undefined;
   const interactive = result.graph && result.graph.nodes.length > 0;
   const svg = el('svg', {
     class: `sc-svg${sketchy ? ' sc-sketchy' : ''}`,
+    id: uid,
     xmlns: 'http://www.w3.org/2000/svg',
     'xmlns:xlink': mark ? 'http://www.w3.org/1999/xlink' : undefined,
     viewBox: `${vx} ${vy} ${vw} ${vh}`,
     role: 'img',
-    'aria-labelledby': `${slug}-title ${slug}-desc`,
+    'aria-labelledby': `${uid}-title ${uid}-desc`,
     lang: spec.lang || undefined, // kept by SVG exports, which leave the page behind
     'data-sc-type': spec.type,
     'data-sc-motion': motionAttr,
@@ -48,15 +53,15 @@ export function buildPage({ spec, result, preset, typeName, settings = {} }) {
     'data-sc-steps': result.steps || 0,
     style: [motionAttr ? motionVars(preset, result.steps || 1) : '', `max-width:${Math.round(vw * 1.25)}px`].filter(Boolean).join(';'),
   }, [
-    el('desc', { id: `${slug}-desc` }, esc(desc)),
-    sketchy ? el('defs', {}, el('filter', { id: `${slug}-sketch`, filterUnits: 'userSpaceOnUse', x: vx, y: vy, width: vw, height: vh }, [
+    el('desc', { id: `${uid}-desc` }, esc(desc)),
+    sketchy ? el('defs', {}, el('filter', { id: `${uid}-sketch`, filterUnits: 'userSpaceOnUse', x: vx, y: vy, width: vw, height: vh }, [
       el('feTurbulence', { type: 'fractalNoise', baseFrequency: '0.035', numOctaves: 2, seed: 7, result: 'n' }),
       el('feDisplacementMap', { in: 'SourceGraphic', in2: 'n', scale: 2.6, xChannelSelector: 'R', yChannelSelector: 'G' }),
     ])) : '',
     el('rect', { class: 'sc-bg', x: vx, y: vy, width: vw, height: vh }),
-    sketchy ? `<style>.sc-sketchy .n-box,.sc-sketchy .e-line,.sc-sketchy .g-box,.sc-sketchy .e-head,.sc-sketchy .e-glyph,.sc-sketchy .lane-band,.sc-sketchy .c-bar,.sc-sketchy .sk-link,.sc-sketchy .venn-c,.sc-sketchy .q-frame,.sc-sketchy .tm-cell{filter:url(#${slug}-sketch)}.sc-sketchy .n-label,.sc-sketchy .venn-label{font-family:'Kalam','Comic Neue',cursive;font-weight:700}</style>` : '',
+    sketchy ? `<style>#${uid}.sc-sketchy .n-box,#${uid}.sc-sketchy .e-line,#${uid}.sc-sketchy .g-box,#${uid}.sc-sketchy .e-head,#${uid}.sc-sketchy .e-glyph,#${uid}.sc-sketchy .lane-band,#${uid}.sc-sketchy .c-bar,#${uid}.sc-sketchy .sk-link,#${uid}.sc-sketchy .venn-c,#${uid}.sc-sketchy .q-frame,#${uid}.sc-sketchy .tm-cell{filter:url(#${uid}-sketch)}#${uid}.sc-sketchy .n-label,#${uid}.sc-sketchy .venn-label{font-family:'Kalam','Comic Neue',cursive;font-weight:700}</style>` : '',
     result.body,
-    mark ? watermarkSvg([vx, vy, vw, vh], slug) : '',
+    mark ? watermarkSvg([vx, vy, vw, vh], uid) : '',
   ]);
   const tokenNames = [...Object.keys(SKINS.light), ...ON_FILL.map((v) => `on-${v}`), 'font-serif', 'font-sans', 'font-mono'].map((k) => `--sc-${k}`).join(',');
   const bar = [
@@ -110,7 +115,7 @@ ${VIEWER_CSS}</style>
 <main class="sc-page">
 <header class="sc-head">
 ${spec.eyebrow !== '' ? `<p class="sc-eyebrow">${esc(spec.eyebrow || typeName)}</p>` : ''}
-<h1 class="sc-title" id="${slug}-title">${esc(title)}</h1>
+<h1 class="sc-title" id="${uid}-title">${esc(title)}</h1>
 ${spec.subtitle ? `<p class="sc-subtitle">${esc(spec.subtitle)}</p>` : ''}
 </header>
 <nav class="sc-bar" aria-label="Diagram controls">${bar}</nav>
@@ -123,7 +128,8 @@ ${spec.caption ? `<figcaption class="sc-caption">${esc(spec.caption)}</figcaptio
 <p class="sc-status" role="status" aria-live="polite"></p>
 ${evidence}
 </main>
-<script>${CLIENT}</script>
+<script>const __scScopeCss = ${scopeCss.toString()};
+${CLIENT}</script>
 </body>
 </html>
 `;
