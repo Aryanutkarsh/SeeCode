@@ -1,0 +1,53 @@
+{
+    "type": "exploded",
+    "title": "Mechanical keyboard",
+    "subtitle": "Five layers under your fingers",
+    "parts": [
+        {
+            "label": "Case",
+            "sub": "aluminium tray",
+            "kind": "tray",
+            "w": 320,
+            "d": 120,
+            "t": 20,
+            "r": 8
+        },
+        {
+            "label": "PCB",
+            "sub": "hot-swap sockets",
+            "kind": "pcb",
+            "w": 300,
+            "d": 104,
+            "t": 4,
+            "r": 4
+        },
+        {
+            "label": "Plate",
+            "sub": "one cut-out per key",
+            "kind": "plate",
+            "w": 300,
+            "d": 104,
+            "t": 3,
+            "r": 4
+        },
+        {
+            "label": "Switches",
+            "sub": "linear",
+            "kind": "switches",
+            "w": 300,
+            "d": 104,
+            "t": 2,
+            "r": 2,
+            "focal": true
+        },
+        {
+            "label": "Keycaps",
+            "sub": "PBT, 61 keys",
+            "kind": "keys",
+            "w": 300,
+            "d": 104,
+            "t": 2,
+            "r": 2
+        }
+    ]
+}

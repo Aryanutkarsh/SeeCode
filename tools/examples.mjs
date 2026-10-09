@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const EXAMPLES = fileURLToPath(new URL('../examples/', import.meta.url));
-export const FAMILIES = { systems: 'Systems', process: 'Process & time', 'data-platform': 'Data platform', structure: 'Structure', charts: 'Charts', everyday: 'Everyday' };
+export const FAMILIES = { systems: 'Systems', process: 'Process & time', 'data-platform': 'Data platform', structure: 'Structure', charts: 'Charts', isometric: 'Isometric', everyday: 'Everyday' };
 
 export function exampleSpecs() {
   const dir = join(EXAMPLES, 'specs');

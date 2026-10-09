@@ -1,0 +1,48 @@
+{
+    "type": "exploded",
+    "title": "AI agent stack",
+    "subtitle": "What sits under the prompt",
+    "parts": [
+        {
+            "label": "Secrets vault",
+            "sub": "scoped tokens",
+            "kind": "vault",
+            "w": 200,
+            "d": 200,
+            "t": 14
+        },
+        {
+            "label": "Tools",
+            "sub": "CLIs, APIs, MCP",
+            "kind": "studs",
+            "w": 200,
+            "d": 200,
+            "t": 14
+        },
+        {
+            "label": "Skills",
+            "sub": "markdown playbooks",
+            "kind": "cards",
+            "w": 200,
+            "d": 200,
+            "t": 14,
+            "focal": true
+        },
+        {
+            "label": "Agent harness",
+            "sub": "Claude Code",
+            "kind": "chip",
+            "w": 200,
+            "d": 200,
+            "t": 14
+        },
+        {
+            "label": "Interface",
+            "sub": "chat or terminal",
+            "kind": "terminal",
+            "w": 200,
+            "d": 200,
+            "t": 14
+        }
+    ]
+}

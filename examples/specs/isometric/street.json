@@ -1,0 +1,120 @@
+{
+    "type": "isometric-plan",
+    "title": "A small street",
+    "marks": [
+        {
+            "kind": "road",
+            "x": 0,
+            "y": 150,
+            "w": 420,
+            "d": 28
+        }
+    ],
+    "boxes": [
+        {
+            "id": "h1",
+            "label": "No. 1",
+            "kind": "house",
+            "x": 20,
+            "y": 30,
+            "w": 80,
+            "d": 70,
+            "h": 34,
+            "step": 1
+        },
+        {
+            "id": "h2",
+            "label": "No. 3",
+            "kind": "house",
+            "x": 130,
+            "y": 30,
+            "w": 90,
+            "d": 70,
+            "h": 40,
+            "focal": true,
+            "step": 2
+        },
+        {
+            "id": "shop",
+            "label": "Corner shop",
+            "kind": "building",
+            "x": 260,
+            "y": 30,
+            "w": 120,
+            "d": 90,
+            "h": 36,
+            "top": "hip",
+            "topH": 30,
+            "step": 3
+        },
+        {
+            "id": "barn",
+            "label": "Barn",
+            "x": 40,
+            "y": 200,
+            "w": 120,
+            "d": 70,
+            "h": 30,
+            "top": "gable",
+            "topH": 36,
+            "side": [
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "box": [
+                        0.38,
+                        0,
+                        0.62,
+                        0.75
+                    ],
+                    "tone": "dark"
+                }
+            ]
+        },
+        {
+            "id": "dome",
+            "label": "Planetarium",
+            "x": 220,
+            "y": 200,
+            "w": 90,
+            "d": 90,
+            "h": 16,
+            "r": "round",
+            "top": "dome",
+            "topH": 44,
+            "items": [
+                {
+                    "shape": "ring",
+                    "at": [
+                        0.5,
+                        0.5
+                    ],
+                    "size": [
+                        0.3,
+                        0.3
+                    ],
+                    "r": "round"
+                }
+            ]
+        },
+        {
+            "id": "lean",
+            "label": "Shed",
+            "x": 340,
+            "y": 210,
+            "w": 60,
+            "d": 50,
+            "h": 20,
+            "top": "shed",
+            "topH": 16
+        },
+        {
+            "kind": "tree",
+            "x": 110,
+            "y": 110,
+            "w": 18,
+            "d": 18,
+            "h": 26
+        }
+    ]
+}

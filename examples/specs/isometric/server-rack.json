@@ -1,0 +1,108 @@
+{
+    "type": "exploded",
+    "title": "One rack, unpacked",
+    "parts": [
+        {
+            "label": "Power",
+            "sub": "2× PDU",
+            "w": 120,
+            "d": 160,
+            "t": 16,
+            "r": 2,
+            "side": [
+                {
+                    "face": "both",
+                    "shape": "lines",
+                    "n": 2,
+                    "dash": true
+                }
+            ]
+        },
+        {
+            "label": "Storage",
+            "sub": "4U, 24 drives",
+            "w": 120,
+            "d": 160,
+            "t": 28,
+            "r": 2,
+            "side": [
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "repeat": [
+                        6,
+                        2
+                    ],
+                    "box": [
+                        0.05,
+                        0.1,
+                        0.95,
+                        0.9
+                    ],
+                    "tone": "dark",
+                    "fill": 0.8
+                }
+            ]
+        },
+        {
+            "label": "Compute",
+            "sub": "2U nodes",
+            "w": 120,
+            "d": 160,
+            "t": 20,
+            "r": 2,
+            "focal": true,
+            "side": [
+                {
+                    "face": "left",
+                    "shape": "lines",
+                    "dir": "v",
+                    "n": 10,
+                    "box": [
+                        0.05,
+                        0.2,
+                        0.6,
+                        0.8
+                    ]
+                },
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "box": [
+                        0.7,
+                        0.35,
+                        0.9,
+                        0.65
+                    ],
+                    "tone": "accent"
+                }
+            ]
+        },
+        {
+            "label": "Switch",
+            "sub": "48 × 25G",
+            "w": 120,
+            "d": 160,
+            "t": 10,
+            "r": 2,
+            "side": [
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "repeat": [
+                        12,
+                        1
+                    ],
+                    "box": [
+                        0.05,
+                        0.25,
+                        0.95,
+                        0.75
+                    ],
+                    "tone": "dark",
+                    "fill": 0.7
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,91 @@
+{
+    "type": "exploded",
+    "title": "Anatomy of a burger",
+    "parts": [
+        {
+            "label": "Bottom bun",
+            "sub": "toasted",
+            "w": 200,
+            "d": 200,
+            "t": 22,
+            "r": "round",
+            "rings": true
+        },
+        {
+            "label": "Patty",
+            "sub": "180 g beef",
+            "w": 196,
+            "d": 196,
+            "t": 18,
+            "r": "round",
+            "rings": true,
+            "items": [
+                {
+                    "shape": "lines",
+                    "box": [
+                        0.2,
+                        0.2,
+                        0.8,
+                        0.8
+                    ],
+                    "n": 5,
+                    "dash": true
+                }
+            ]
+        },
+        {
+            "label": "Cheese",
+            "w": 180,
+            "d": 180,
+            "t": 4,
+            "r": 12,
+            "focal": true
+        },
+        {
+            "label": "Lettuce",
+            "w": 210,
+            "d": 210,
+            "t": 6,
+            "r": "round",
+            "items": [
+                {
+                    "shape": "ring",
+                    "box": [
+                        0.1,
+                        0.1,
+                        0.9,
+                        0.9
+                    ],
+                    "r": "round",
+                    "dash": true
+                }
+            ]
+        },
+        {
+            "label": "Top bun",
+            "sub": "sesame",
+            "kind": "bun",
+            "w": 200,
+            "d": 200,
+            "t": 12,
+            "topH": 46,
+            "items": [
+                {
+                    "shape": "dots",
+                    "repeat": [
+                        6,
+                        6
+                    ],
+                    "box": [
+                        0.18,
+                        0.18,
+                        0.82,
+                        0.82
+                    ],
+                    "fill": 0.22,
+                    "tone": "light"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,190 @@
+{
+    "type": "isometric-plan",
+    "title": "Corner coffee shop",
+    "subtitle": "From the door to a seat",
+    "rooms": [
+        {
+            "id": "bar",
+            "label": "Espresso bar",
+            "sub": "order, pickup",
+            "x": 0,
+            "y": 0,
+            "w": 150,
+            "d": 110,
+            "focal": true
+        },
+        {
+            "id": "kitchen",
+            "label": "Kitchen",
+            "sub": "back of house",
+            "x": 150,
+            "y": 0,
+            "w": 130,
+            "d": 110,
+            "walls": true,
+            "door": "S"
+        },
+        {
+            "id": "seating",
+            "label": "Seating",
+            "sub": "22 seats",
+            "x": 0,
+            "y": 110,
+            "w": 280,
+            "d": 170
+        },
+        {
+            "id": "wc",
+            "label": "Restroom",
+            "x": 280,
+            "y": 0,
+            "w": 80,
+            "d": 110,
+            "walls": true,
+            "door": "S"
+        }
+    ],
+    "boxes": [
+        {
+            "kind": "counter",
+            "x": 20,
+            "y": 70,
+            "w": 110,
+            "d": 20,
+            "h": 18,
+            "items": [
+                {
+                    "box": [
+                        0.08,
+                        0.2,
+                        0.28,
+                        0.8
+                    ],
+                    "h": 10,
+                    "tone": "dark",
+                    "r": 2
+                }
+            ],
+            "step": 1
+        },
+        {
+            "x": 170,
+            "y": 14,
+            "w": 40,
+            "d": 30,
+            "h": 24,
+            "side": [
+                {
+                    "face": "left",
+                    "shape": "panel",
+                    "box": [
+                        0.1,
+                        0.2,
+                        0.9,
+                        0.8
+                    ],
+                    "tone": "mid"
+                }
+            ],
+            "step": 1
+        },
+        {
+            "x": 220,
+            "y": 14,
+            "w": 44,
+            "d": 30,
+            "h": 24,
+            "step": 1
+        },
+        {
+            "kind": "table",
+            "x": 40,
+            "y": 150,
+            "w": 26,
+            "d": 26,
+            "h": 12,
+            "step": 2
+        },
+        {
+            "kind": "table",
+            "x": 110,
+            "y": 150,
+            "w": 26,
+            "d": 26,
+            "h": 12,
+            "step": 2
+        },
+        {
+            "kind": "table",
+            "x": 180,
+            "y": 150,
+            "w": 26,
+            "d": 26,
+            "h": 12,
+            "step": 2
+        },
+        {
+            "kind": "table",
+            "x": 70,
+            "y": 215,
+            "w": 26,
+            "d": 26,
+            "h": 12,
+            "step": 2
+        },
+        {
+            "kind": "table",
+            "x": 150,
+            "y": 215,
+            "w": 26,
+            "d": 26,
+            "h": 12,
+            "step": 2
+        },
+        {
+            "x": 10,
+            "y": 262,
+            "w": 200,
+            "d": 12,
+            "h": 10,
+            "kind": "counter",
+            "step": 3
+        },
+        {
+            "kind": "post",
+            "x": 240,
+            "y": 130,
+            "w": 6,
+            "d": 6,
+            "h": 20,
+            "step": 3
+        },
+        {
+            "kind": "post",
+            "x": 240,
+            "y": 170,
+            "w": 6,
+            "d": 6,
+            "h": 20,
+            "step": 3
+        },
+        {
+            "kind": "post",
+            "x": 240,
+            "y": 210,
+            "w": 6,
+            "d": 6,
+            "h": 20,
+            "step": 3
+        },
+        {
+            "kind": "tree",
+            "x": 300,
+            "y": 240,
+            "w": 30,
+            "d": 30,
+            "h": 34,
+            "step": 3
+        }
+    ]
+}
