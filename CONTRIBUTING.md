@@ -122,7 +122,14 @@ Then regenerate the README images (`npm run shots` and `npm run feature-gifs`). 
 
 Every merge to `main` that touches the skill triggers `.github/workflows/release.yml`. It bumps the patch version in `package.json` and every plugin manifest, tags the commit, and attaches a reproducible `seecode.zip` to a GitHub release. Installed plugins update from there. Maintainers can run the workflow by hand to cut a `minor` or `major` release instead.
 
-To build the zip locally: `npm run zip`.
+To build the zip locally: `npm run zip`. It holds only shipped files (what git tracks, plus new files it doesn't ignore), so local clutter such as `.repos/` never gets in.
+
+**Merged is not released, and released is not installed.** After a merge, check each step and note it in the pull request:
+
+1. **CI is green on `main`**, including the `install` job (a real `npx skills add` on Linux and Windows).
+2. **The Release run succeeded**, and the new tag and `seecode.zip` appear under [Releases](https://github.com/Aryanutkarsh/seecode/releases).
+3. **An install picks it up:** `npx skills update seecode -g` (or a plugin update), then `node <installed skill>/scripts/seecode.mjs doctor` shows the new `version`.
+4. **README media still match:** if the change is visible, refresh the screenshots and GIFs (see [Screenshots and samples](#screenshots-and-samples)).
 
 ## Dependencies and licenses
 
