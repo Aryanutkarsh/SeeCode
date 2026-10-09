@@ -41,6 +41,8 @@ export function findChrome() {
   return null;
 }
 
+const CDP_TIMEOUT = Number(process.env.SEECODE_CDP_TIMEOUT_MS) || 120000;
+
 class Cdp {
   constructor(proc) {
     this.proc = proc;
@@ -63,10 +65,15 @@ class Cdp {
       }
     });
   }
-  send(method, params = {}, sessionId) {
+  // every command has a deadline: a stalled renderer (slow CI runners) must
+  // fail the export so its finally closes Chrome, not hang the process forever
+  send(method, params = {}, sessionId, timeout = CDP_TIMEOUT) {
     const id = ++this.id;
     this.proc.stdio[3].write(`${JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) })}\0`);
-    return new Promise((resolve, reject) => this.pending.set(id, { resolve, reject }));
+    return new Promise((resolve, reject) => {
+      const t = setTimeout(() => { this.pending.delete(id); reject(new Error(`browser did not answer ${method} within ${timeout / 1000}s`)); }, timeout);
+      this.pending.set(id, { resolve: (v) => { clearTimeout(t); resolve(v); }, reject: (e) => { clearTimeout(t); reject(e); } });
+    });
   }
   once(method, sessionId, timeout = 30000) {
     return new Promise((resolve, reject) => {
@@ -162,6 +169,8 @@ async function launchChrome(path) {
   ], { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'] });
   const cdp = new Cdp(proc);
   const exited = new Promise((r) => proc.once('exit', r));
+  // a crashed browser fails whatever was waiting on it
+  exited.then(() => { for (const { reject } of cdp.pending.values()) reject(new Error('browser exited')); cdp.pending.clear(); });
   await Promise.race([cdp.send('Browser.getVersion'), exited.then(() => { throw new Error('browser exited at startup'); })]);
   // never save files to the user's Downloads: SeeCode writes its own outputs,
   // and a page's in-page Export menu (exercised by tests) would otherwise land there
@@ -177,7 +186,7 @@ async function launchChrome(path) {
       return page;
     },
     async close() {
-      await cdp.send('Browser.close').catch(() => {});
+      await cdp.send('Browser.close', {}, undefined, 3000).catch(() => {});
       await Promise.race([exited, new Promise((r) => setTimeout(r, 2000))]);
       if (proc.exitCode === null) proc.kill('SIGKILL');
       // Chrome's helpers can still be flushing the profile after the main
