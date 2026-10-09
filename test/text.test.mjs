@@ -43,3 +43,11 @@ test('lang sets the page language, right-to-left direction and the svg lang', ()
   assert.equal(bad.ok, false);
   assert.match(bad.problems[0].fix, /zh-CN/);
 });
+
+test('sans widths use measured IBM Plex advances, with a small margin', () => {
+  // Plex Sans 400: W 891, M 812 per mille; the old estimate ran ~15% short on these
+  const wide = textWidth('WWWMMM', { size: 100 });
+  assert.ok(wide >= 3 * 89.1 + 3 * 81.2 && wide <= (3 * 89.1 + 3 * 81.2) * 1.05, String(wide));
+  assert.ok(textWidth('Checkout API', { size: 12, weight: 600 }) > textWidth('Checkout API', { size: 12 }), 'bold is wider');
+  assert.equal(textWidth('abc', { size: 12, mono: true }), 3 * 0.6 * 12, 'mono is unchanged');
+});

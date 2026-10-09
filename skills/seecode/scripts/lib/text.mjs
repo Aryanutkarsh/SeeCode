@@ -1,7 +1,15 @@
-// Text width estimation without a browser. Conservative per-character
-// advances (in em) for IBM Plex Sans / Plex Mono; wide (CJK, full-width)
-// characters always cost 1em and combining marks cost nothing.
+// Text width estimation without a browser: measured advances (in em) for
+// IBM Plex Sans / Plex Mono; wide (CJK, full-width) characters always cost
+// 1em and combining marks cost nothing.
 
+// IBM Plex Sans advance widths (per mille of the font size) for printable
+// ASCII (32–126), measured in Chrome at weights 400 and 600. Other scripts
+// fall back to the shape heuristics below.
+const PLEX_400 = [236,284,419,713,598,927,694,242,335,335,450,600,272,399,272,383,600,600,600,600,600,600,600,600,600,600,292,292,600,600,600,477,881,641,653,621,671,583,542,695,707,400,510,634,501,812,707,708,606,708,640,568,572,678,614,891,613,593,580,317,383,317,600,565,600,534,580,497,580,549,319,528,568,250,250,527,272,873,568,560,580,580,367,480,351,568,492,768,507,499,464,343,314,343,600];
+const PLEX_600 = [236,309,471,656,600,960,713,260,337,337,556,600,299,402,299,437,600,600,600,600,600,600,600,600,600,600,319,319,600,600,600,493,882,672,663,642,689,600,551,712,719,423,545,678,521,817,719,712,641,712,664,591,580,689,642,949,655,632,599,329,437,329,600,559,600,559,600,508,600,558,346,545,588,275,275,562,294,888,588,563,600,600,393,491,374,588,524,819,544,521,502,363,376,363,600];
+// Kerning and a fallback font (Noto Sans, system-ui when web fonts are
+// blocked) can run a little wider than the measured advances.
+const MARGIN = 1.03;
 const NARROW = new Set([...`il.,:;'|!\`ijlrtf()[]{}`]);
 const WIDE_UPPER = new Set([...'MWQOGDCH@%&']);
 
@@ -19,11 +27,17 @@ function isMark(cp) {
   return (cp >= 0x0300 && cp <= 0x036f) || (cp >= 0x20d0 && cp <= 0x20ff) || cp === 0x200d || (cp >= 0xfe00 && cp <= 0xfe0f);
 }
 
-export function advance(ch, mono) {
+export function advance(ch, mono, bold = false) {
   const cp = ch.codePointAt(0);
   if (isMark(cp)) return 0;
   if (isWide(cp)) return 1;
   if (mono) return 0.6;
+  if (cp >= 32 && cp <= 126) return ((bold ? PLEX_600 : PLEX_400)[cp - 32] / 1000) * MARGIN;
+  const k = bold ? 1.04 : 1;
+  return heuristic(ch) * k;
+}
+
+function heuristic(ch) {
   if (ch === ' ') return 0.28;
   if (NARROW.has(ch)) return 0.3;
   if (WIDE_UPPER.has(ch)) return 0.74;
@@ -43,12 +57,12 @@ export function textWidth(str, { size = 12, mono = false, tracking = 0, upper = 
   const s = upper ? String(str).toUpperCase() : String(str);
   let em = 0;
   let n = 0;
+  const bold = !mono && weight >= 600;
   for (const ch of s) {
-    em += advance(ch, mono);
+    em += advance(ch, mono, bold);
     n++;
   }
-  const bold = !mono && weight >= 600 ? 1.04 : 1;
-  return (em * size * bold + Math.max(0, n - 1) * tracking * size) * widthScale;
+  return (em * size + Math.max(0, n - 1) * tracking * size) * widthScale;
 }
 
 export const snap = (v, g = 4) => Math.round(v / g) * g;
