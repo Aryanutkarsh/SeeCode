@@ -41,3 +41,14 @@ test('exported SVGs scope their styles, so two can share one page', async () => 
   assert.equal(scopeCss(':root{--a:1}.sc-svg.x .y{a:b}.n,.m{c:d}@media (max-width:9px){.p{e:f}}@keyframes k{to{opacity:1}}', 'd'),
     '#d{--a:1}#d.sc-svg.x .y{a:b}#d .n,#d .m{c:d}@media (max-width:9px){#d .p{e:f}}@keyframes k{to{opacity:1}}');
 });
+
+test('geometry is rounded: no long decimals or exponents in any example', async () => {
+  const { roundGeometry } = await import('../skills/seecode/scripts/lib/svg.mjs');
+  assert.equal(roundGeometry('M5.204748896376251e-15,-120 L103.92304845413264,-60.00000000000001'), 'M0,-120 L103.92,-60');
+  for (const ex of exampleSpecs()) {
+    const h = renderSpec(JSON.parse(readFileSync(ex.path, 'utf8')), { specPath: ex.path }).html;
+    const svg = h.slice(h.indexOf('<svg class="sc-svg'), h.indexOf('</svg>'));
+    const geo = [...svg.matchAll(/ (?:d|points|transform)="([^"]*)"/g)].map((m) => m[1]).join(' ');
+    assert.doesNotMatch(geo, /\d\.\d{3,}|\d[eE][-+]?\d/, ex.type);
+  }
+});

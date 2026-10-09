@@ -8,13 +8,19 @@ export function esc(v) {
     .replace(/"/g, '&quot;');
 }
 
-const r2 = (n) => (Number.isInteger(n) ? n : Math.round(n * 100) / 100);
+const r2 = (n) => (Number.isInteger(n) ? n : Math.round(n * 100) / 100 || 0);
+
+// Geometry strings get the same 2-decimal rounding as numeric attributes, so
+// paths never carry 16-digit coordinates or exponents like 5.2e-15.
+const GEOMETRY = new Set(['d', 'points', 'transform']);
+const NUM = /-?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/gi;
+export const roundGeometry = (str) => String(str).replace(NUM, (m) => String(r2(Number(m))));
 
 function attrs(a) {
   let out = '';
   for (const [k, v] of Object.entries(a)) {
     if (v === undefined || v === null || v === false) continue;
-    out += ` ${k}="${esc(typeof v === 'number' ? r2(v) : v)}"`;
+    out += ` ${k}="${esc(typeof v === 'number' ? r2(v) : GEOMETRY.has(k) ? roundGeometry(v) : v)}"`;
   }
   return out;
 }
