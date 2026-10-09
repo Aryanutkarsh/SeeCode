@@ -105,8 +105,10 @@
     const lab = el.querySelector('.e-label');
     return { el, id: el.getAttribute('data-sc-edge'), from: el.getAttribute('data-from'), to: el.getAttribute('data-to'), d, kind, label: lab ? lab.textContent.trim() : '' };
   });
-  const KIND_NAMES = { focal: 'Focal', backend: 'Service', store: 'Store', external: 'External', input: 'Input', optional: 'Optional', security: 'Security', muted: 'Context' };
-  const EDGE_NAMES = { default: 'Call / flow', primary: 'Primary path', link: 'HTTP / API', async: 'Async', return: 'Return', muted: 'Secondary', rel: 'Relation' };
+  // the spec's legend.entries labels rename kinds everywhere the viewer names them
+  const LABELS = meta.labels || {};
+  const KIND_NAMES = { focal: 'Focal', backend: 'Service', store: 'Store', external: 'External', input: 'Input', optional: 'Optional', security: 'Security', muted: 'Context', ...LABELS };
+  const EDGE_NAMES = { default: 'Call / flow', primary: 'Primary path', link: 'HTTP / API', async: 'Async', return: 'Return', muted: 'Secondary', rel: 'Relation', ...LABELS };
   function info(id) {
     const n = nodeEls.get(id);
     if (!n) return { id, label: id };
@@ -595,7 +597,7 @@
     const ekinds = [...new Set(edges.map((e) => e.kind))].filter((k) => EDGE_NAMES[k] && k !== 'default');
     if (kinds.length + ekinds.length < 2) lens.hidden = true;
     const list = lens.querySelector('.sc-menu-list');
-    list.innerHTML = kinds.map((k) => `<button data-k="${k}" role="menuitem">${KIND_NAMES[k]}</button>`).join('') + ekinds.map((k) => `<button data-ek="${k}" role="menuitem">${EDGE_NAMES[k]} edges</button>`).join('');
+    list.innerHTML = kinds.map((k) => `<button data-k="${k}" role="menuitem">${esc(KIND_NAMES[k])}</button>`).join('') + ekinds.map((k) => `<button data-ek="${k}" role="menuitem">${esc(LABELS[k] || `${EDGE_NAMES[k]} edges`)}</button>`).join('');
     lens.querySelector('[data-sc-action="lens"]').addEventListener('click', (ev) => { ev.stopPropagation(); lens.classList.toggle('is-open'); });
     list.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { lens.classList.remove('is-open'); applyLens(b.getAttribute('data-k'), b.getAttribute('data-ek'), b.textContent); }));
     document.addEventListener('click', () => lens.classList.remove('is-open'));

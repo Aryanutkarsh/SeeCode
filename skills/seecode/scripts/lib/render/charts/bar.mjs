@@ -3,7 +3,7 @@
 import { el, text } from '../../svg.mjs';
 import { textWidth } from '../../text.mjs';
 import { niceDomain, floorTo, ticks, fmt } from './scale.mjs';
-import { legend } from '../shared/legend.mjs';
+import { legend, legendOptions } from '../shared/legend.mjs';
 
 export const family = 'chart';
 
@@ -69,7 +69,7 @@ function renderMarimekko(spec) {
     out.push(el('g', { class: 'sc-wipe-down', 'data-sc-step': st, style: `--step:${st}` }, parts));
     x += w;
   });
-  const lg = legend({ x: 0, y: H + 44, w: W, extra: names.map((n, k) => ({ type: 'swatch', swatch: `s-${(k % 5) + 1}`, label: n })) });
+  const lg = legend({ x: 0, y: H + 44, w: W, custom: legendOptions(spec), extra: names.map((n, k) => ({ type: 'swatch', swatch: `s-${(k % 5) + 1}`, key: n, label: n })) });
   out.push(lg.svg);
   return { body: out.join(''), viewBox: [-16, -16, W + 32, H + 60 + lg.h], steps: Math.min(12, cols.length), problems };
 }
@@ -146,7 +146,7 @@ export function render(spec) {
     });
     let h = plotH + (rotate ? labelW * 0.6 + 24 : 34);
     if (multi) {
-      const lg = legend({ x: left, y: h + 4, w: W - left, extra: series.map((s, i) => ({ type: 'swatch', swatch: s.focal ? 'c-bar is-focal' : `c-bar s-${(i % 5) + 1}`, label: s.name })) });
+      const lg = legend({ x: left, y: h + 4, w: W - left, custom: legendOptions(spec), extra: series.map((s, i) => ({ type: 'swatch', swatch: s.focal ? 'c-bar is-focal' : `c-bar s-${(i % 5) + 1}`, key: s.name, label: s.name })) });
       out.push(lg.svg);
       h += lg.h + 12;
     }
@@ -180,7 +180,7 @@ export function render(spec) {
   });
   let h = H + 28;
   if (multi) {
-    const lg = legend({ x: catW, y: h, w: plotW, extra: series.map((s, i) => ({ type: 'swatch', swatch: s.focal ? 'c-bar is-focal' : `c-bar s-${(i % 5) + 1}`, label: s.name })) });
+    const lg = legend({ x: catW, y: h, w: plotW, custom: legendOptions(spec), extra: series.map((s, i) => ({ type: 'swatch', swatch: s.focal ? 'c-bar is-focal' : `c-bar s-${(i % 5) + 1}`, key: s.name, label: s.name })) });
     out.push(lg.svg);
     h += lg.h + 8;
   }

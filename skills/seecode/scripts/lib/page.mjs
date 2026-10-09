@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { el, esc } from './svg.mjs';
 import { FONTS_HREF, DIAGRAM_CSS, SKINS, ON_FILL, skinCss } from './tokens.mjs';
+import { legendLabels } from './render/shared/legend.mjs';
 import { cleanFonts } from './config/config.mjs';
 import { watermarkOn, watermarkSvg, MARK, FAVICON } from './mark.mjs';
 import { MOTION_CSS, motionVars } from './motion.mjs';
@@ -93,6 +94,7 @@ ${VIEWER_CSS}</style>
 <script type="application/json" id="sc-meta">${JSON.stringify({
     type: typeName,
     groups: Object.fromEntries((result.graph?.nodes || []).filter((n) => n.group).map((n) => [n.id, n.group])),
+    labels: legendLabels(spec),
     evidence: (spec.evidence || []).reduce((m, e) => ((m[e.id] = m[e.id] || []).push({ file: e.file, line: e.line, note: e.note }), m), {}),
   }).replace(/</g, '\\u003c')}</script>
 </head>

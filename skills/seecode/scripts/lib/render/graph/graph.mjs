@@ -6,7 +6,7 @@ import { el, text, roundedPath } from '../../svg.mjs';
 import { textWidth, ceil4 } from '../../text.mjs';
 import { sizeNode, drawNode, normalizeKind, fieldY } from '../shared/nodes.mjs';
 import { drawEdge, placeLabel, labelBox } from '../shared/edges.mjs';
-import { legend } from '../shared/legend.mjs';
+import { legend, legendOptions } from '../shared/legend.mjs';
 import { routeEdges } from './route.mjs';
 import { checkRoutes } from './verify.mjs';
 import { compressSteps } from '../../motion.mjs';
@@ -343,17 +343,21 @@ export function render(input) {
   let legendSvg = '';
   const statuses = [...new Set(nodes.map((n) => n.status).filter(Boolean))];
   const changes = [...new Set(nodes.map((n) => n.change).filter(Boolean))];
-  if (spec.legend !== false && (!NO_LEGEND.has(spec.type) || spec.legend === true)) {
+  const forced = spec.legend === true || (spec.legend && typeof spec.legend === 'object');
+  if (spec.legend !== false && (!NO_LEGEND.has(spec.type) || forced)) {
     const nk = [...new Set(nodes.map((n) => n.kind))];
     const ek = [...new Set(edges.map((e) => e.kind))];
-    if (nk.length + ek.length > 2 || spec.legend === true) {
+    if (nk.length + ek.length > 2 || forced) {
       const extra = [
-        ...statuses.map((st) => ({ type: 'swatch', swatch: `st-${st}`, label: STATUS_NAMES[st] || st })),
-        ...changes.map((c) => ({ type: 'text', label: { added: '+ New', removed: '− Removed', changed: '~ Changed' }[c] })),
+        ...statuses.map((st) => ({ type: 'swatch', swatch: `st-${st}`, key: st, label: STATUS_NAMES[st] || st })),
+        ...changes.map((c) => ({ type: 'text', key: c, label: { added: '+ New', removed: '− Removed', changed: '~ Changed' }[c] })),
       ];
-      const lg = legend({ nodeKinds: nk, edgeKinds: (ek.length > 1 || ek[0] !== 'default') ? ek.filter((k) => !['one-one', 'one-many', 'many-one', 'many-many', 'zero-many', 'one-zero', 'extends', 'implements', 'composes', 'aggregates', 'depends', 'assoc', 'line'].includes(k)) : [], extra, x: minX + 24, y: maxY + 8, w: maxX - minX - 48 });
+      const custom = legendOptions(spec);
+      const lg = legend({ nodeKinds: nk, edgeKinds: (ek.length > 1 || ek[0] !== 'default') ? ek.filter((k) => !['one-one', 'one-many', 'many-one', 'many-many', 'zero-many', 'one-zero', 'extends', 'implements', 'composes', 'aggregates', 'depends', 'assoc', 'line'].includes(k)) : [], extra, custom, x: minX + 24, y: maxY + 8, w: maxX - minX - 48 });
       legendSvg = lg.svg;
       maxY += lg.h + 8;
+      const unknown = Object.keys(custom.entries).filter((k) => !lg.keys.includes(k));
+      if (unknown.length) problems.push({ code: 'W_LEGEND_KEY', at: 'legend.entries', msg: `no ${unknown.map((k) => `"${k}"`).join(', ')} in this diagram's legend`, fix: `use one of: ${lg.keys.join(', ')}` });
     }
   }
   maxY += 24;

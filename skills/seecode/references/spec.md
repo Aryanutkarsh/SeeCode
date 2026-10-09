@@ -8,8 +8,9 @@
 - `skin`: `light` | `dark` | `terminal`. The page has its own light/dark toggle.
 - `size`: `auto` | `wide` | `slide` | `square`.
 - `budget`: `strict` | `balanced` (default) | `faithful` (imports, up to 24 nodes) | `off`.
-- `legend`: `false` hides it.
+- `legend`: `false` hides it, `true` forces it. Rename or hide entries, and retitle it, with an object: `{"title":"Key","entries":{"backend":{"label":"Holiday"},"async":{"label":"Reminder"},"store":{"visible":false}}}`. Keys are node kinds, edge kinds, statuses, changes or series names; an unknown key gives `W_LEGEND_KEY` listing the valid ones. The viewer's Lens menu and detail panel use the same names.
 - `evidence`: `[{id,file,line?,note?}]`.
+
 - `out`: the output path, relative to the spec.
 
 **Problems**: `{code,at,msg,fix}`.

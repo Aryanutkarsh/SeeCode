@@ -44,7 +44,7 @@ Plans, moves, money and applications use the same types as systems:
 | Where an application or order stands | `state`, `kanban` |
 | Weighing options | `quadrant`, `bar` |
 
-Write labels in the reader's words ("Pay deposit", not "POST /deposit"), and rename the legend to match. Ask for missing personal facts (dates, amounts, rules) and never invent them; leave a clearly marked placeholder if the user wants a draft now.
+Write labels in the reader's words ("Pay deposit", not "POST /deposit"), and rename the legend to match (`legend.entries`, see `spec.md`). Ask for missing personal facts (dates, amounts, rules) and never invent them; leave a clearly marked placeholder if the user wants a draft now.
 
 ## No browser where you run (e.g. the Claude.ai sandbox)
 `export --formats svg` (including `--for pdf|figma`) works without a browser. PNG, GIF and MP4 from the CLI need one. If `export` reports no browser, deliver the HTML plus the SVG, and tell the user to choose **Export → PNG / GIF / MP4** in the diagram itself: it renders those formats in their own browser.

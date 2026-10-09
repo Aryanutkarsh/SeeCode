@@ -4,16 +4,36 @@ import { textWidth } from '../../text.mjs';
 const NODE_NAMES = { focal: 'Focal', backend: 'Service', store: 'Store', external: 'External', input: 'Input', optional: 'Optional', security: 'Security', muted: 'Context' };
 const EDGE_NAMES = { default: 'Call / flow', primary: 'Primary path', link: 'HTTP / API', async: 'Async', return: 'Return', muted: 'Secondary' };
 
-// Returns { svg, h } for a legend strip starting at (x, y) spanning width w.
-export function legend({ nodeKinds = [], edgeKinds = [], x, y, w, extra = [] }) {
-  const items = [];
-  for (const k of nodeKinds) items.push({ type: 'node', k, label: NODE_NAMES[k] || k });
-  for (const k of edgeKinds) items.push({ type: 'edge', k, label: EDGE_NAMES[k] || k });
-  items.push(...extra);
-  if (items.length < 2) return { svg: '', h: 0 };
+// spec.legend may be true/false or { title, entries: { <key>: { label, visible } } },
+// where <key> is a node kind, edge kind, status, change or series name.
+export function legendOptions(spec) {
+  const l = spec && spec.legend;
+  return l && typeof l === 'object' ? { title: l.title, entries: l.entries || {} } : { entries: {} };
+}
+
+// Custom names per key, for the viewer's lens menu and detail panel.
+export function legendLabels(spec) {
+  const { entries } = legendOptions(spec);
+  return Object.fromEntries(Object.entries(entries).filter(([, e]) => e && e.label).map(([k, e]) => [k, e.label]));
+}
+
+// Returns { svg, h, keys } for a legend strip starting at (x, y) spanning
+// width w. `keys` lists every key that could be relabelled, shown or not.
+export function legend({ nodeKinds = [], edgeKinds = [], x, y, w, extra = [], custom = { entries: {} } }) {
+  const entries = custom.entries || {};
+  const all = [
+    ...nodeKinds.map((k) => ({ type: 'node', k, key: k, label: NODE_NAMES[k] || k })),
+    ...edgeKinds.map((k) => ({ type: 'edge', k, key: k, label: EDGE_NAMES[k] || k })),
+    ...extra,
+  ];
+  const keys = all.map((it) => it.key).filter(Boolean);
+  const items = all
+    .filter((it) => !(it.key && entries[it.key] && entries[it.key].visible === false))
+    .map((it) => (it.key && entries[it.key] && entries[it.key].label ? { ...it, label: entries[it.key].label } : it));
+  if (items.length < 2) return { svg: '', h: 0, keys };
   const parts = [
     el('line', { class: 'lg-rule', x1: x, y1: y, x2: x + w, y2: y }),
-    text({ class: 'lg-title', x, y: y + 16 }, 'LEGEND'),
+    text({ class: 'lg-title', x, y: y + 16 }, (custom.title || 'Legend').toUpperCase()),
   ];
   let cx = x;
   let cy = y + 34;
@@ -40,5 +60,5 @@ export function legend({ nodeKinds = [], edgeKinds = [], x, y, w, extra = [] }) 
     if (hit['data-sc-kind'] || hit['data-sc-ekind']) parts.splice(start, parts.length - start, el('g', hit, [el('rect', { x: cx - 2, y: cy - 11, width: tw - 6, height: 15, fill: 'transparent' }), ...parts.slice(start)]));
     cx += tw;
   }
-  return { svg: el('g', { class: 'sc-legend' }, parts), h: cy - y + 10 };
+  return { svg: el('g', { class: 'sc-legend' }, parts), h: cy - y + 10, keys };
 }
