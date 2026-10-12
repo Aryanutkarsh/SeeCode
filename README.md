@@ -394,7 +394,7 @@ Issues, pull requests and new diagram types are welcome. Start with the [contrib
 
 ## Privacy
 
-SeeCode has no server, accounts or telemetry. Generated diagrams load their fonts from Google Fonts, and the in-page GIF/MP4 export loads its encoders from jsDelivr. [PRIVACY.md](PRIVACY.md) lists every request.
+SeeCode has no server, accounts or telemetry. Generated diagrams load their fonts from Google Fonts (turn that off with `config set fonts system`), and the in-page GIF/MP4 export loads its encoders from jsDelivr. [PRIVACY.md](PRIVACY.md) lists every request.
 
 ## Acknowledgements
 

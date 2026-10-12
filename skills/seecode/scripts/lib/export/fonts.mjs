@@ -45,7 +45,8 @@ export async function embedFonts(svg) {
         faces.push(block.replace(/src:[^;]+;/, `src:url(${await toData(src)}) format('woff2');`));
       }
     }
-    if (!faces.length) return { ok: false, svg, error: 'no font faces returned' };
+    // nothing to fetch when the page was built with fonts: 'system'
+    if (!faces.length && googleFamilies(svg).length) return { ok: false, svg, error: 'no font faces returned' };
     let out = svg.replace(/@import url\('https:\/\/fonts\.googleapis\.com\/[^']*'\);/g, '');
     out = out.replace(/(<style>)/, `$1${faces.join('')}`);
     // a brand's self-hosted faces: inline each file so the SVG works offline

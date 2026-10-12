@@ -46,6 +46,7 @@ Diagrams, specs and exports are written where you or your agent choose. Settings
 ## Your controls
 
 - Delete generated files, settings and profiles at any time; they are ordinary files.
+- Set `fonts` to `system` (`config set fonts system`, or `"fonts": "system"` in a spec) and generated pages no longer link to Google Fonts; SVG export then makes no font request either. Fonts from a brand profile are separate and still load from where the profile points.
 - Open a diagram offline and it falls back to system fonts. Export SVG without network access and the fonts aren't embedded; the SVG still works.
 - Export GIF and MP4 from the command line instead of the Export menu to avoid the jsDelivr request.
 - Uninstall the skill or plugin from your agent at any time.

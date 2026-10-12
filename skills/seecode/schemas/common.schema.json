@@ -142,6 +142,13 @@
       "type": "boolean",
       "description": "SeeCode logo in the bottom-right corner (default true). Set false only when the user asks to remove it."
     },
+    "fonts": {
+      "enum": [
+        "google",
+        "system"
+      ],
+      "description": "Where the typefaces come from (default google). system leaves the Google Fonts stylesheet out and uses the system fallbacks."
+    },
     "lang": {
       "type": "string",
       "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$",

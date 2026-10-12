@@ -15,6 +15,7 @@
 | `duration` | `auto` | GIF/MP4 length: `auto` (reveal plus one token loop) or a number of seconds |
 | `outputDir` | `diagrams` | Where specs and HTML are written |
 | `profile` | `null` | A brand profile slug from `~/.seecode/profiles/<slug>.json` |
+| `fonts` | `google` | `google` loads Fraunces and IBM Plex from Google Fonts; `system` leaves that request out and uses system fonts (for offline or restricted networks) |
 | `watermark` | `true` | SeeCode logo in each diagram's bottom-right corner; `false` removes it (only when the user asks) |
 
 **Commands**
