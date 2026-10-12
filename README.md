@@ -33,11 +33,20 @@
 
 ## Install, then describe what you want to see
 
+**Claude Code** (recommended: the plugin keeps you on the latest release):
+
+```text
+/plugin marketplace add Aryanutkarsh/seecode
+/plugin install seecode@seecode
+```
+
+**Cursor, Codex, OpenCode and other Agent Skills hosts:**
+
 ```bash
 npx skills add Aryanutkarsh/seecode -g
 ```
 
-Works with Claude Code, Cursor, Codex, OpenCode and other Agent Skills hosts. [More install options](#install).
+[More install options, and how to update](#install).
 
 Then ask:
 
@@ -314,7 +323,7 @@ If a reader wouldn't learn more from the picture than from a good paragraph, ski
 
 ## Install
 
-**Claude Code** (plugin, auto-updates):
+**Claude Code** (plugin, recommended: it updates with every release):
 
 ```text
 /plugin marketplace add Aryanutkarsh/seecode
