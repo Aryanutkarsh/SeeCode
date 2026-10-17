@@ -872,7 +872,8 @@
     const vars = names.map((n) => `${n}:${cs.getPropertyValue(n).trim()}`).join(';');
     const css = document.getElementById('sc-diagram-css').textContent;
     const style = document.createElementNS(NS, 'style');
-    const fontRule = fonts || `@import url('${document.getElementById('sc-fonts').href}');`;
+    const fontsLink = document.getElementById('sc-fonts');
+    const fontRule = fonts || (fontsLink ? `@import url('${fontsLink.href}');` : '');
     // scoped to the diagram's id so several exports can share one page
     const rules = `:root{${vars}}${css}`;
     style.textContent = `${fontRule}${clone.id && typeof __scScopeCss === 'function' ? __scScopeCss(rules, clone.id) : rules}`;

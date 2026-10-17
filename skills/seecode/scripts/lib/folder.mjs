@@ -6,7 +6,7 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { deflateRawSync } from 'node:zlib';
 import { renderSpec, outPathFor, writeAtomic, summarize } from './render.mjs';
-import { FONTS_HREF, skinCss } from './tokens.mjs';
+import { FONTS_HREF, webFontsOn, skinCss } from './tokens.mjs';
 import * as config from './config/config.mjs';
 
 export const isDir = (p) => { try { return statSync(p).isDirectory(); } catch { return false; } };
@@ -41,7 +41,7 @@ export function renderFolder(dir, { motion } = {}) {
   });
   const done = diagrams.filter((d) => d.ok);
   const index = join(dir, 'index.html');
-  writeAtomic(index, indexHtml(basename(dir), done.map((d) => ({ href: basename(d.out), title: d.title, type: d.type }))));
+  writeAtomic(index, indexHtml(basename(dir), done.map((d) => ({ href: basename(d.out), title: d.title, type: d.type })), settings));
   return {
     ok: done.length === diagrams.length,
     folder: dir,
@@ -53,10 +53,10 @@ export function renderFolder(dir, { motion } = {}) {
   };
 }
 
-export function indexHtml(name, cards) {
+export function indexHtml(name, cards, settings = {}) {
   const title = name.replace(/[-_]+/g, ' ');
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
-<link rel="stylesheet" href="${FONTS_HREF.replace(/&/g, '&amp;')}"><style>${skinCss()}
+${webFontsOn({}, settings) ? `<link rel="stylesheet" href="${FONTS_HREF.replace(/&/g, '&amp;')}">` : ''}<style>${skinCss()}
 *{box-sizing:border-box;margin:0}body{background:var(--sc-paper);color:var(--sc-ink);font-family:var(--sc-font-sans);padding:48px 24px}
 main{max-width:1240px;margin:0 auto}h1{font-family:var(--sc-font-serif);font-weight:400;font-size:36px}p.lead{color:var(--sc-muted);margin:8px 0 24px}
 ol{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;counter-reset:d}

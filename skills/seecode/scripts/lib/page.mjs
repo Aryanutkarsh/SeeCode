@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { el, esc } from './svg.mjs';
-import { FONTS_HREF, DIAGRAM_CSS, SKINS, ON_FILL, skinCss } from './tokens.mjs';
+import { FONTS_HREF, webFontsOn, DIAGRAM_CSS, SKINS, ON_FILL, skinCss } from './tokens.mjs';
 import { legendLabels } from './render/shared/legend.mjs';
 import { scopeCss, shortHash } from './scope.mjs';
 import { cleanFonts } from './config/config.mjs';
@@ -27,6 +27,7 @@ export const isRtl = (lang) => RTL.has(String(lang || '').split('-')[0].toLowerC
 export function buildPage({ spec, result, preset, typeName, settings = {} }) {
   const sketchy = (spec.style || settings.style) === 'sketchy';
   const mark = watermarkOn(spec, settings);
+  const webFonts = webFontsOn(spec, settings);
   const [vx, vy, vw, vh0] = result.viewBox.map((v) => Math.round(v));
   // the watermark gets its own strip under the diagram, so it never covers content
   const vh = mark ? vh0 + MARK.strip : vh0;
@@ -95,8 +96,8 @@ export function buildPage({ spec, result, preset, typeName, settings = {} }) {
 <meta name="generator" content="SeeCode">
 <link rel="icon" type="image/png" href="${FAVICON()}">
 <title>${esc(title)}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link id="sc-fonts" rel="stylesheet" href="${esc(FONTS_HREF)}${sketchy ? '&amp;family=Kalam:wght@400;700' : ''}">${(brandFonts.href || []).map((h) => `
+${webFonts ? `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link id="sc-fonts" rel="stylesheet" href="${esc(FONTS_HREF)}${sketchy ? '&amp;family=Kalam:wght@400;700' : ''}">` : ''}${(brandFonts.href || []).map((h) => `
 <link class="sc-brand-fonts" rel="stylesheet" href="${esc(h)}">`).join('')}${brandFonts.faces ? `
 <style id="sc-brand-faces">${brandFonts.faces}</style>` : ''}
 <style>${skinCss({ skin: spec.skin || settings.skin || 'light', brand })}

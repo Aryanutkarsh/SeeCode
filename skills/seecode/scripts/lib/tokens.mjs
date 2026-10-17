@@ -9,6 +9,12 @@ import { OBJECT_CSS } from './render/structure/object.mjs';
 export const FONTS_HREF =
   'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap';
 
+// fonts: 'system' leaves the Google Fonts stylesheet out, so a page makes no
+// font request and the system fallbacks in each font stack apply.
+export function webFontsOn(spec = {}, settings = {}) {
+  return (spec.fonts !== undefined ? spec.fonts : settings.fonts) !== 'system';
+}
+
 export const SKINS = {
   light: {
     paper: '#f6f5f1', 'paper-2': '#eceae4', ink: '#1d2433', 'ink-strong': '#0b0f19',

@@ -16,7 +16,10 @@ export const DEFAULTS = {
   outputDir: 'diagrams',
   profile: null,
   watermark: true,
+  fonts: 'google',
 };
+
+const FONTS = ['google', 'system'];
 
 const KNOWN = new Set(Object.keys(DEFAULTS).concat(['brand']));
 
@@ -147,6 +150,7 @@ function coerce(v) {
 
 export function set(cwd, key, value, { global = false } = {}) {
   if (!KNOWN.has(key)) throw new Error(`unknown setting "${key}" (known: ${[...KNOWN].join(', ')})`);
+  if (key === 'fonts' && !FONTS.includes(value)) throw new Error(`fonts must be one of: ${FONTS.join(', ')}`);
   const p = paths(cwd);
   const file = global ? p.global : p.project;
   let cur = readJson(file) || (global ? { ...DEFAULTS } : {});
