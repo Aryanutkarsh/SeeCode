@@ -40,8 +40,9 @@ jobs:
           echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
       - name: Commit and tag
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # authored as the maintainer, so the bot doesn't show up as a contributor
+          git config user.name "aryanutkarsh"
+          git config user.email "aryanutkarsh2339@gmail.com"
           git commit -am "chore(release): v${{ steps.bump.outputs.version }}"
           git tag "v${{ steps.bump.outputs.version }}"
           git push origin HEAD --tags
