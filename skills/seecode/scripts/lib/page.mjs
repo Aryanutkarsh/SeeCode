@@ -33,8 +33,9 @@ export function buildPage({ spec, result, preset, typeName, settings = {} }) {
   const vh = mark ? vh0 + MARK.strip : vh0;
   const slug = slugify(spec.title || spec.type);
   // ids inside the SVG: unique per diagram (two diagrams can share a title),
-  // stable across renders of the same spec
-  const uid = `${slug}-${shortHash(JSON.stringify(spec))}`;
+  // stable across renders of the same spec. The scoped styles select #uid, and
+  // a CSS id can't start with an ASCII digit, so "3 services" gets a prefix.
+  const uid = `${/^[0-9]/.test(slug) ? `sc-${slug}` : slug}-${shortHash(JSON.stringify(spec))}`;
   const title = spec.title || typeName;
   const desc = spec.subtitle || `${typeName} diagram${result.graph ? ` with ${result.graph.nodes.length} elements` : ''}.`;
   const motionAttr = preset && preset !== 'none' ? preset : undefined;

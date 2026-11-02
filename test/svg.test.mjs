@@ -42,6 +42,18 @@ test('exported SVGs scope their styles, so two can share one page', async () => 
     '#d{--a:1}#d.sc-svg.x .y{a:b}#d .n,#d .m{c:d}@media (max-width:9px){#d .p{e:f}}@keyframes k{to{opacity:1}}');
 });
 
+test('a title starting with a digit still gives a valid id selector', () => {
+  const html = renderSpec({ type: 'architecture', title: '3 services read the cache', nodes: [{ id: 'a', label: 'A', row: 0, col: 0 }, { id: 'b', label: 'B', row: 0, col: 1 }], edges: [['a', 'b']] }).html;
+  const id = /<svg class="sc-svg[^"]*" id="([^"]+)"/.exec(html)[1];
+  assert.match(id, /^sc-3-services-read-the-cache-/, 'a CSS id cannot start with a digit');
+  assert.match(html, /data-sc-slug="3-services-read-the-cache"/, 'the download name keeps the title as written');
+  const style = /<style>([\s\S]*?)<\/style>/.exec(svgFromHtml(html))[1];
+  assert.match(style, new RegExp(`#${id}\\{--sc-paper:`));
+  // non-ASCII digits are valid identifier starts, so they stay as they are
+  const arabic = renderSpec({ type: 'architecture', title: '٣ خدمات', nodes: [{ id: 'a', label: 'A', row: 0, col: 0 }], edges: [] }).html;
+  assert.match(arabic, /<svg class="sc-svg[^"]*" id="٣-/);
+});
+
 test('geometry is rounded: no long decimals or exponents in any example', async () => {
   const { roundGeometry } = await import('../skills/seecode/scripts/lib/svg.mjs');
   assert.equal(roundGeometry('M5.204748896376251e-15,-120 L103.92304845413264,-60.00000000000001'), 'M0,-120 L103.92,-60');
