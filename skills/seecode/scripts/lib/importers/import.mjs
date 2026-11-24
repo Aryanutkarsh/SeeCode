@@ -17,6 +17,10 @@ import { clean } from './common.mjs';
 import { compactJson, renderSpec } from '../render.mjs';
 import { status as configStatus } from '../config/config.mjs';
 
+// YAML nests a bare `key:` over deeper-indented lines or a list; D2 nests with
+// braces. With no .yml name to go on (text passed to the API), this keeps
+// compose files and CI workflows out of the D2 fallback.
+const YAML_NESTING = /^([ \t]*)[\w.-]+:[ \t]*(#.*)?\r?\n\1([ \t]+\S|- )/m;
 const MERMAID_HEADS = /^(flowchart|graph|sequenceDiagram|stateDiagram(-v2)?|erDiagram|classDiagram(-v2)?|gantt|pie|mindmap|journey|timeline|quadrantChart|sankey(-beta)?|xychart(-beta)?|gitGraph|block(-beta)?|architecture(-beta)?|C4\w+)\b/m;
 
 export function detect(name, text) {
@@ -52,7 +56,7 @@ export function detect(name, text) {
   if (/^\s*Table\s+\w+/m.test(t)) return 'dbml';
   if (MERMAID_HEADS.test(t.replace(/^---[\s\S]*?---\s*/, '').split('\n').find((l) => l.trim() && !/^\s*%%/.test(l)) || '')) return 'mermaid';
   if (ext === '.json' || /^[[{]/.test(t)) return 'json';
-  if (/(->|--)/.test(t) && /:/.test(t)) return 'd2';
+  if (/(->|--)/.test(t) && /:/.test(t) && !YAML_NESTING.test(t)) return 'd2';
   return null;
 }
 

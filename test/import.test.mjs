@@ -53,6 +53,10 @@ test('YAML other than OpenAPI is not mistaken for D2', () => {
   assert.equal(detect('ci.yaml', 'jobs:\n  test:\n    steps:\n      - run: npm test -- --coverage\n'), null);
   assert.equal(detect('api.yaml', 'openapi: 3.0.0\npaths: {}\n'), 'openapi');
   assert.equal(detect('x.txt', 'api -> db: reads'), 'd2');
+  // no file name (text passed to the API): YAML is told apart by its nesting
+  assert.equal(detect('', compose), null);
+  assert.equal(detect('', 'steps:\n- run: npm test -- --coverage\n'), null);
+  for (const f of ['net.d2', 'tables.d2']) assert.equal(detect('', readFileSync(join(FIX, f), 'utf8')), 'd2', f);
 });
 
 test('labels from imported files are data: tags stripped, length capped', () => {
