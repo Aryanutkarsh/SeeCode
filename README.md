@@ -6,11 +6,13 @@
 </h1>
 <h3 align="center">Diagrams that move, explain and export themselves.</h3>
 
+<p align="center"><strong>English</strong> &nbsp;·&nbsp; <a href="README.zh-CN.md">简体中文</a></p>
+
 <p align="center">Ask your agent for a diagram. SeeCode turns a short spec into an editorial-quality, animated, explorable diagram: one HTML file you can hover, click and walk through, or export as SVG, PNG, GIF or MP4 for wherever it needs to go.</p>
 
 <p align="center">
   <a href="#install"><strong>Install</strong></a> &nbsp;·&nbsp;
-  <a href="#42-diagram-types"><strong>Diagram types</strong></a> &nbsp;·&nbsp;
+  <a href="#45-diagram-types"><strong>Diagram types</strong></a> &nbsp;·&nbsp;
   <a href="#see-it-in-action"><strong>Features</strong></a> &nbsp;·&nbsp;
   <a href="#themes-and-your-brand"><strong>Themes</strong></a> &nbsp;·&nbsp;
   <a href="#bring-what-you-already-have"><strong>Import</strong></a> &nbsp;·&nbsp;
