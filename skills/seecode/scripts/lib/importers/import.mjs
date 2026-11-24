@@ -39,6 +39,10 @@ export function detect(name, text) {
   if (/<mxfile|<mxGraphModel/.test(t)) return 'drawio';
   if (/"type"\s*:\s*"excalidraw"/.test(t.slice(0, 400))) return 'excalidraw';
   if (/^(openapi|swagger)\s*:|"(openapi|swagger)"\s*:/m.test(t.slice(0, 2000))) return 'openapi';
+  // OpenAPI is the only YAML we import. Compose files, k8s manifests and CI
+  // workflows have ":" on every line and "--" in their commands, so the sniffs
+  // below would take them for D2; leave them to the agent instead.
+  if (ext === '.yml' || ext === '.yaml') return null;
   if (/<(\w+:)?definitions[\s\S]*bpmn/i.test(t.slice(0, 2000))) return 'bpmn';
   if (/^@start\w+/m.test(t)) return 'plantuml';
   if (/^\s*(strict\s+)?(di)?graph\b[^{]*\{/i.test(t)) return 'dot';

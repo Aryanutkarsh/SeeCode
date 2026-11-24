@@ -47,6 +47,14 @@ test('format detection sniffs content when the extension is generic', () => {
   assert.equal(detect('x.xml', '<mxfile><diagram/></mxfile>'), 'drawio');
 });
 
+test('YAML other than OpenAPI is not mistaken for D2', () => {
+  const compose = 'services:\n  api:\n    depends_on: [redis]\n  redis:\n    image: redis:7\n    command: redis-server --appendonly yes\n';
+  assert.equal(detect('docker-compose.yml', compose), null);
+  assert.equal(detect('ci.yaml', 'jobs:\n  test:\n    steps:\n      - run: npm test -- --coverage\n'), null);
+  assert.equal(detect('api.yaml', 'openapi: 3.0.0\npaths: {}\n'), 'openapi');
+  assert.equal(detect('x.txt', 'api -> db: reads'), 'd2');
+});
+
 test('labels from imported files are data: tags stripped, length capped', () => {
   const r = importFile(join(FIX, 'board.drawio'), { out: join(out, 'b.json') });
   const spec = JSON.parse(readFileSync(r.draft, 'utf8'));
